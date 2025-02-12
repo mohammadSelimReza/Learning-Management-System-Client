@@ -27,7 +27,7 @@ export const login = async (email, password) => {
 
 export const registration = async (full_name, email, password, password2) => {
   try {
-    const { data } = await apiInstance.post("user/registration/", {
+    const { data } = await apiInstance.post("user/registrations/", {
       full_name,
       email,
       password,

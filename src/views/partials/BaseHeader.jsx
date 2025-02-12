@@ -12,8 +12,6 @@ function BaseHeader() {
   const [cartCount, setCartCount] = useContext(CartContext);
   const [teacher,setTeacher] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn());
-  console.log(isLoggedIn);
-  console.log(CartID())
   const name = UserData()?.full_name;
   const user_id = UserData()?.user_id;
   const navigate = useNavigate();

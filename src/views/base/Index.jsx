@@ -30,6 +30,8 @@ import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import useAxios from "../../utils/useAxios";
 import UserData from "../plugin/UserData";
 import CartID from "../plugin/CartID";
+import Toast from "../plugin/Toast";
+import { OrbitProgress } from "react-loading-indicators";
 
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
@@ -57,17 +59,20 @@ function Index() {
   const user_id = UserData()?.user_id;
   const [testimonials, setTestimonials] = useState([]);
   const navigate = useNavigate();
-
+  const [loading,setLoading] = useState(true);
   const fetchData = async () => {
+    setLoading(true)
     try {
       const res = await apiInstance.get("/course/course/");
       const blogRes = await apiInstance.get("/blog/");
       const resReview = await apiInstance.get("/review/");
       setBlogData(blogRes.data);
       setCourse(res.data.slice(0, 3));
-      setTestimonials(resReview.data);
+      setTestimonials(resReview.data?.slice(3,6));
+      setLoading(false)
     } catch (error) {
       console.log(error);
+      setLoading(false)
     }
   };
   useEffect(() => {
@@ -100,18 +105,25 @@ function Index() {
     },
   ];
   const coureDetailView = async (slug) => {
+    setLoading(true)
     try {
       const res = await apiInstance.get(`/course/course/${slug}`);
       console.log(res.data);
+      setLoading(false)
       navigate(`/course-detail/${res.data?.slug}`);
-    } catch (error) {}
+    } catch (error) {
+      setLoading(false)
+    }
   };
   const handleSubscribe = (e) => {
     e.preventDefault();
-    alert(`Subscribed with: ${email}`);
+    Toast().fire({
+      title:`Subscribed with: ${email}`,
+      icon:"success", 
+    });
     setEmail("");
   };
-
+  console.log(course)
   return (
     <>
       <BaseHeader />
@@ -280,7 +292,15 @@ function Index() {
           </div>
           <div className="container py-5">
             <div className="row g-4">
-              {course.map((item) => (
+              {
+                loading ?
+                (<div className="text-center">
+                <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
+                </div>)
+                :
+                (
+                  <>
+                  {course.map((item) => (
                 <div key={item?.course_id} className="col-md-4">
                   <div className="card border-0 shadow-sm rounded overflow-hidden">
                     {/* Image with Price Badge */}
@@ -333,6 +353,9 @@ function Index() {
                   </div>
                 </div>
               ))}
+                  </>
+                )
+              }
             </div>
             <p className="text-center py-5">
               Take the control of their life back and start doing things to make
@@ -485,7 +508,16 @@ function Index() {
           </div>
 
           <div className="row justify-content-center align-items-center">
-            {testimonials.map((item) => (
+            {
+              loading
+              ?
+              (<div className="text-center">
+                <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
+                </div>)
+                :
+                (
+                  <>
+                  {testimonials.map((item) => (
               <div key={item.review_id} className="col-md-4">
                 <div className="card d-flex justify-content-center align-items-center border-0 shadow-sm rounded text-center p-4">
                   <img
@@ -512,6 +544,10 @@ function Index() {
                 </div>
               </div>
             ))}
+                  </>
+                )
+            }
+            
           </div>
         </div>
       </section>
@@ -523,8 +559,15 @@ function Index() {
           The ultimate planning solution for busy professionals looking to
           achieve their goals.
         </p>
-
-        <Swiper
+          {
+            loading ?
+            (<div className="text-center">
+              <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
+              </div>)
+              :
+              (
+                <>
+                <Swiper
           modules={[Autoplay, Pagination, Navigation]}
           spaceBetween={20}
           slidesPerView={1}
@@ -569,6 +612,10 @@ function Index() {
             </SwiperSlide>
           ))}
         </Swiper>
+                </>
+              )
+          }
+        
       </section>
 
       {/* newsletter */}

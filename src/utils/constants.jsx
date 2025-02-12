@@ -1,1 +1,1 @@
-export const API_BASE_URL = "https://edusoft-three.vercel.app/api/v1";
+export const API_BASE_URL = "https://learning-management-system-backend-pi.vercel.app/api/v1";

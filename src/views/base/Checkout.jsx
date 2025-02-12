@@ -12,18 +12,23 @@ function Checkout() {
     const [orderItems, setOrderItems] = useState([])
     const param = useParams()
     const user_id = UserData().user_id
+    const [loading,setLoading] = useState(true)
+    const [processing,setProcessing] = useState(true)
     console.log("id",user_id)
     console.log(param)
     const fetchOrder = async () => {
+        setLoading(true)
         try {
             await useAxios().get(`/order/checkout/${param?.order_oid}/`).then((res) => {
                 console.log(res.data)
                 setOrder(res.data)
                 setOrderItems(res.data?.order_items)
             })
+            setLoading(false)
 
         } catch (error) {
             console.log(error)
+            setLoading(false)
         }
     }
 
@@ -33,6 +38,7 @@ function Checkout() {
     console.log("order:", order)
     console.log("Order_items:", orderItems)
     const pay = async (e) => {
+        setProcessing(true)
         console.log("mew")
         e.preventDefault();
         try {
@@ -41,19 +47,30 @@ function Checkout() {
                 user_id: user_id,
             });
             console.log(res.data);
-
+            setProcessing(false)
             if (res.data.redirect_url) {
                 window.location.href = res.data.redirect_url; 
             }
         } catch (error) {
             console.log(error);
+            setProcessing(false)
         }
     };
     return (
         <>
             <BaseHeader />
 
-            <section className="py-0">
+           {
+            loading ?
+            (
+                <div className="text-center">
+                    <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
+                    </div>
+            )
+            :
+            (
+                <>
+                 <section className="py-0">
                 <div className="container">
                     <div className="row">
                         <div className="col-12">
@@ -228,7 +245,13 @@ function Checkout() {
                                                 </li>
                                             </ul>
                                             <div className="d-grid">
-                                                <button onClick={pay} className="btn btn-lg btn-success mt-2"> Pay With SSLCommerz</button>
+                                                {
+                                                    processing ?
+                                                    <button onClick={pay} className="btn btn-lg btn-success mt-2" disabled={true}> Proceeding to pay...</button>
+                                                    :
+                                                    <button onClick={pay} className="btn btn-lg btn-success mt-2"> Pay With SSLCommerz</button>
+                                                    
+                                                }
                                             </div>
                                             <p className="small mb-0 mt-2 text-center">
                                                 By proceeding to payment, you agree to these{" "}<a href="#"> <strong>Terms of Service</strong></a>
@@ -241,6 +264,9 @@ function Checkout() {
                     </div>
                 </div>
             </section>
+                 </>
+            )
+           }
 
             <BaseFooter />
         </>

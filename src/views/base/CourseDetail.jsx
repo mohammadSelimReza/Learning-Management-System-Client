@@ -13,6 +13,7 @@ import Toast from "../plugin/Toast";
 import GetCurrentAddress from "../plugin/useLocation";
 import { CartContext } from "../plugin/useContext";
 import { useAuthStore } from "../../store/auth";
+import { OrbitProgress } from "react-loading-indicators";
 
 function CourseDetail() {
   const [courses, setCourses] = useState([]);
@@ -23,29 +24,38 @@ function CourseDetail() {
   const country = GetCurrentAddress()?.country;
   const user_id = UserData()?.user_id;
   const cartId = CartID();
+  const [loading,setLoading] = useState(true)
+  const [processing,setProcessing] =useState(true)
   const navigate = useNavigate();
   const fetchCart = async () => {
     try {
+      setLoading(true)
       const resCourses = await apiInstance.get(`/course/course/`);
       const res = await useAxios().get(`/course/cart/${CartID()}/`);
       setCourses(resCourses.data.slice(0, 4));
       setCart(res.data);
       setCartCount(res.data.length);
+      setLoading(false)
     } catch (error) {
       console.error("Error fetching cart:", error);
+      setLoading(false)
     }
   };
   const fetchData = async () => {
+    setLoading(true)
     try {
       const res = await useAxios().get(`/course/course/${param?.slug}`);
       setCourse(res.data);
+      setLoading(false)
     } catch (error) {
       console.error("Error fetching course:", error);
+      setLoading(false);
     }
   };
 
   // ➕ Add to Cart
   const addToCart = async (courseId, userId, countryName, cartId) => {
+    setProcessing(true)
     const isLoggedIn = useAuthStore.getState().isLoggedIn();
     if (!isLoggedIn) {
       Toast().fire({
@@ -69,12 +79,14 @@ function CourseDetail() {
         icon: "success",
       });
       if (fetchCart) fetchCart();
+      setProcessing(false)
     } catch (error) {
       console.log(error)
       Swal.fire({
         icon: "error",
         title: `${error}`,
       });
+      setProcessing(false);
     }
   };
 
@@ -91,8 +103,17 @@ function CourseDetail() {
   return (
     <>
       <BaseHeader />
-
-      <>
+      {
+        loading ?
+              ( <>
+              <div className="text-center">
+                <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
+                </div>
+              </> )
+              :
+              (
+                <>
+                <>
         <section className="bg-light py-0 py-sm-5">
           <div className="container">
             <div className="row py-5">
@@ -1186,6 +1207,23 @@ function CourseDetail() {
                         </div>
                         {/* Buttons */}
                         <div className="mt-3 d-sm-flex justify-content-sm-between ">
+                         {
+                          !processing ?
+                          <button
+                            onClick={() =>
+                              addToCart(
+                                course?.course_id,
+                                user_id,
+                                "BD",
+                                cartId
+                              )
+                            }
+                            className="btn btn-primary mb-0 w-100 me-2"
+                            disabled={true}
+                          >
+                            <i className="fas fa-shopping-cart"></i> Adding...
+                          </button>
+                          :
                           <button
                             onClick={() =>
                               addToCart(
@@ -1199,6 +1237,8 @@ function CourseDetail() {
                           >
                             <i className="fas fa-shopping-cart"></i> Add To Cart
                           </button>
+                         }
+                          
                           <Link
                             to="/cart/"
                             className="btn btn-success mb-0 w-100"
@@ -1358,6 +1398,10 @@ function CourseDetail() {
           </div>
         </section>
       </>
+                </>
+              )
+      }
+      
 
       <BaseFooter />
     </>

@@ -3,18 +3,24 @@ import { useNavigate } from "react-router-dom";
 import apiInstance from "../../utils/axios";
 import BaseHeader from "../partials/BaseHeader";
 import BaseFooter from "../partials/BaseFooter";
+import { OrbitProgress } from "react-loading-indicators";
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
+  const [loading,setLoading] =useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCourses = async () => {
+      setLoading(true)
       try {
         const res = await apiInstance.get("/course/course/");
-        setCourses(res.data); // Fetch and set all courses
+        setCourses(res.data);
+        
+        setLoading(false)  
       } catch (error) {
         console.log(error);
+        setLoading(false)
       }
     };
     fetchCourses();
@@ -37,7 +43,17 @@ export default function Courses() {
           </div>
 
           <div className="row g-4">
-            {courses.map((item) => (
+            {
+              loading ?
+              ( <>
+              <div className="text-center">
+                <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
+                </div>
+              </> )
+              :
+              (
+                <>
+                {courses.map((item) => (
               <div key={item?.course_id} className="col-md-4">
                 <div className="card border-0 shadow-sm rounded overflow-hidden">
                   <div
@@ -88,6 +104,10 @@ export default function Courses() {
                 </div>
               </div>
             ))}
+                </>
+              )
+            }
+            
           </div>
         </div>
       </section>

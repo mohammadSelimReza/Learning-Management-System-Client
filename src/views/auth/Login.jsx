@@ -111,7 +111,7 @@ function Login() {
                     <div className="d-grid">
                       <button
                         type="submit"
-                        className="btn btn-primary"
+                        className="btn btn-main"
                         disabled={loading}
                       >
                         {loading ? (

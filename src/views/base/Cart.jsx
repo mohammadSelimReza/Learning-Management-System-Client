@@ -8,6 +8,7 @@ import CartID from '../plugin/CartID'
 import Toast from '../plugin/Toast'
 import { CartContext } from '../plugin/useContext'
 import UserData from '../plugin/UserData'
+import { OrbitProgress } from 'react-loading-indicators'
 
 function Cart() {
     const user_id = UserData()?.user_id;
@@ -18,19 +19,25 @@ function Cart() {
     const [country, setCountry] = useState("")
     const [phone, setPhone] = useState("")
     const [cartCount, setCartCount] = useContext(CartContext)
+    cosnt [loading,setLoading] = useState(true)
+    const [processing,setProcessing] = useState(true)
     const navigate = useNavigate();
     const fetchCart = async () => {
+        setLoading(true)
         try {
             const res = await useAxios().get(`/course/cart/${CartID()}/`)
             setCart(res.data)
             setCartCount(res.data.length)
             const resState = await useAxios().get(`/course/cart/stat/${CartID()}/`)
             setCartItem(resState.data.status)
+            setLoading(false)
         } catch (error) {
             console.log(error)
+            setLoading(false)
         }
     }
     const cartItemDelete = async (cartID, itemId) => {
+        setLoading(true)
         await useAxios().delete(`/course/cart/${cartID}/${itemId}/`)
             .then((res) => {
                 fetchCart();
@@ -38,6 +45,7 @@ function Cart() {
                     icon: "success",
                     title: "cart item deleted",
                 })
+                setLoading(false)
             });
     }
     useEffect(() => {
@@ -45,6 +53,7 @@ function Cart() {
 
     }, [])
     const createOrder = async (e) => {
+        setProcessing(true)
         e.preventDefault();
 
         const formData = {
@@ -65,21 +74,30 @@ function Cart() {
                 title: res.data?.message || "Order created successfully! and Deleted from cart",
             });
             fetchCart();
+            setProcessing(false)
             if (orderID) {
                 navigate(`/checkout/${orderID}`);
             }
         } catch (error) {
             console.error("Order creation failed:", error);
+            setProcessing(false)
         }
     };
-    console.log(cart)
-    console.log(cartItem)
+
 
     return (
         <>
             <BaseHeader />
 
-            <section className="py-0">
+            {
+                loading ?
+                (<div className="text-center">
+                    <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
+                    </div> )
+                :
+                (
+                    <>
+                    <section className="py-0">
                 <div className="container">
                     <div className="row">
                         <div className="col-12">
@@ -230,8 +248,13 @@ function Cart() {
                                         </li>
                                     </ul>
                                     <div className="d-grid">
+                                       {
+                                        processing ?
+                                        <button type='submit' className="btn btn-lg btn-success" disabled={true}>Processing...</button>
+                                        :
                                         <button type='submit' className="btn btn-lg btn-success">Checkout</button>
 
+                                       }
                                     </div>
                                     <p className="small mb-0 mt-2 text-center">
                                         By proceeding to checkout, you agree to these{" "}<a href="#"> <strong>Terms of Service</strong></a>
@@ -242,6 +265,9 @@ function Cart() {
                     </form>
                 </div>
             </section>
+                    </>
+                )
+            }
 
             <BaseFooter />
         </>
