@@ -94,7 +94,7 @@ function Register() {
                     </label>
                     <input
                       type="password"
-                      id="password"
+                      id="password1"
                       className="form-control"
                       name="password"
                       placeholder="**************"
@@ -109,7 +109,7 @@ function Register() {
                     </label>
                     <input
                       type="password"
-                      id="password"
+                      id="password2"
                       className="form-control"
                       name="password"
                       placeholder="**************"

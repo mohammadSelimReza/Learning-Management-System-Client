@@ -1,6 +1,10 @@
 import React from 'react'
+import UserData from '../../plugin/UserData'
+import { Link } from 'react-router'
 
 function Header() {
+    const user = UserData()
+    console.log(user)
     return (
         <div className="row align-items-center">
             <div className="col-xl-12 col-lg-12 col-md-12 col-12">
@@ -11,14 +15,14 @@ function Header() {
                                 <img src="https://geeksui.codescandy.com/geeks/assets/images/avatar/avatar-4.jpg" className="avatar-xl rounded-circle border border-4 border-white" alt="avatar" style={{ width: "70px", height: "70px", borderRadius: "50%", objectFit: "cover" }} />
                             </div>
                             <div className="lh-1">
-                                <h2 className="mb-0"> Destiny Franks</h2>
-                                <p className="mb-0 d-block">@desphixs</p>
+                                <h2 className="mb-0">{user?.full_name} </h2>
+                                <p className="mb-0 d-block">@{user?.username} </p>
                             </div>
                         </div>
                         <div>
-                            <a href="profile-edit.html" className="btn btn-primary btn-sm d-none d-md-block" >
+                            <Link to={"/student/profile"} className="btn btn-primary btn-sm d-none d-md-block" >
                                 Account Setting <i className='fas fa-gear fa-spin'></i>
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>

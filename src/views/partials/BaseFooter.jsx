@@ -1,23 +1,21 @@
 import React from "react";
-
 function BaseFooter() {
   return (
-    <footer className="pt-lg-8 pt-5 footer bg-dark text-white mt-5">
+    <footer className="pt-lg-8 pt-5 footer text-black mt-5">
       <div className="container mt-lg-2">
         <div className="row">
-          <div className="col-lg-4 col-md-6 col-12 text-white">
+          <div className="col-lg-4 col-md-6 col-12 text-black">
             {/* about company */}
             <div className="mb-4">
-              <h1>LMS</h1>
+              <h1>EduSoft</h1>
               <div className="mt-4">
                 <p>
-                  LMS is feature-rich components and beautifully Bootstrap UIKit
-                  for developers, built with bootstrap responsive framework.
+                EduSoft is an LMS (Learning Management System) designed to provide a seamless and efficient platform for online learning. It helps students, instructors, and administrators manage courses, track progress, and facilitate interactive learning.
                 </p>
                 {/* social media */}
                 <div className="fs-4 mt-4">
                   {/*Facebook*/}
-                  <a href="#" className="me-2 text-white">
+                  <a href="#" className="me-2 text-black">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width={16}
@@ -30,7 +28,7 @@ function BaseFooter() {
                     </svg>
                   </a>
                   {/*Twitter*/}
-                  <a href="#" className="me-2 text-white">
+                  <a href="#" className="me-2 text-black">
                     <svg
                       xmlns="http://www.w3.org/2000/svg "
                       width={16}
@@ -43,7 +41,7 @@ function BaseFooter() {
                     </svg>
                   </a>
                   {/*GitHub*/}
-                  <a href="#" className="text-white">
+                  <a href="#" className="text-black">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width={16}
@@ -65,27 +63,27 @@ function BaseFooter() {
               <h3 className="fw-bold mb-3">Company</h3>
               <ul className="list-unstyled nav nav-footer flex-column nav-x-0">
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     About
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     Pricing
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     Blog
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     Careers
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     Contact
                   </a>
                 </li>
@@ -98,27 +96,27 @@ function BaseFooter() {
               <h3 className="fw-bold mb-3">Support</h3>
               <ul className="list-unstyled nav nav-footer flex-column nav-x-0">
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     Help and Support
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     Become Instructor
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     Get the app
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     FAQ’s
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="nav-link text-white">
+                  <a href="#" className="nav-link text-black">
                     Tutorial
                   </a>
                 </li>
@@ -132,9 +130,9 @@ function BaseFooter() {
               <p>123 Main Street, U.S.A</p>
               <p className="mb-1">
                 Email:
-                <a href="#" className="text-white">
+                <a href="#" className="text-black">
                   {" "}
-                  support@LMS.com
+                  support@edusoft.com
                 </a>
               </p>
               <p>
@@ -167,21 +165,21 @@ function BaseFooter() {
               <div className="me-4">
                 <span>
                   ©<span id="copyright5"></span>
-                  LMS
+                  EduSoft
                 </span>
               </div>
               <div>
                 <nav className="nav nav-footer">
-                  <a className="nav-link text-white ps-0" href="#">
+                  <a className="nav-link text-black ps-0" href="#">
                     Privacy Policy
                   </a>
-                  <a className="nav-link text-white px-2 px-md-3" href="#">
+                  <a className="nav-link text-black px-2 px-md-3" href="#">
                     Cookie Notice
                   </a>
-                  <a className="nav-link text-white d-none d-lg-block" href="#">
+                  <a className="nav-link text-black d-none d-lg-block" href="#">
                     Do Not Sell My Personal Information
                   </a>
-                  <a className="nav-link text-white" href="#">
+                  <a className="nav-link text-black" href="#">
                     Terms of Use
                   </a>
                 </nav>

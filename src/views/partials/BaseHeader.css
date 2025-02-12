@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@600&display=swap');
+
+.web-navbar {
+    background-color: #F7F9FB;
+    font-family: "Kumbh Sans", serif;
+    height: 5rem;
+
+}
+
+@media(min-width:990px) {
+    .navbar-custom{
+        height: 6rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .navbar-brand{
+        font-size: 3rem;
+    }
+    .nav-item{
+        margin: 0 4px;
+    }
+    .half-side{
+        display: flex;
+        flex-direction: row-reverse;
+        
+    }
+    .w-side{
+        width: 15%;
+    }
+    .w-center{
+        width: 70%;
+        
+    }
+    .center-nav{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .end-part{
+        display: flex;
+        justify-content: end;
+    }
+    /* .container{
+        display: flex;
+    } */
+}
+@media screen and (max-width: 989px) {
+    .center-nav {
+        display: none;
+    }
+}

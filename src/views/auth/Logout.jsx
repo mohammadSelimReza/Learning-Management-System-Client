@@ -1,13 +1,15 @@
 import BaseHeader from "../partials/BaseHeader";
 import BaseFooter from "../partials/BaseFooter";
-import { useEffect } from "react";
-import { logout } from "../../utils/auth";
 import { Link } from "react-router";
+import { useContext, useEffect } from "react";
+import { CartContext } from "../plugin/useContext";
 
 function Logout() {
-  useEffect(() => {
-    logout();
-  }, []);
+  const [cartCount,setCartCount] = useContext(CartContext)
+  
+  useEffect(()=>{
+    setCartCount(0)
+  })
   return (
     <>
       <BaseHeader />

@@ -1,7 +1,9 @@
-import axios from "axios";
 import { useAuthStore } from "../store/auth";
 import { jwtDecode } from "jwt-decode";
 import apiInstance from "./axios";
+import Toast from "../views/plugin/Toast";
+
+
 export const login = async (email, password) => {
   try {
     const { data, status } = await apiInstance.post("user/token/", {
@@ -31,8 +33,6 @@ export const registration = async (full_name, email, password, password2) => {
       password,
       password2,
     });
-
-    await login(email, password);
     alert("Registration Successfully");
     return { data, error: null };
   } catch (error) {
@@ -48,8 +48,13 @@ export const registration = async (full_name, email, password, password2) => {
 export const logout = () => {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
+  localStorage.removeItem("order_oid");
+  localStorage.removeItem("randomString");
   useAuthStore.getState().setUser(null);
-  alert("Logout Successfully.");
+  Toast().fire({
+    icon:"warning",
+    title:"You have successfully logged out.",
+  })
 };
 
 export const setUser = async () => {
@@ -57,49 +62,75 @@ export const setUser = async () => {
   const refresh_token = localStorage.getItem("refresh_token");
 
   if (!access_token || !refresh_token) {
-    // alert("No user token found!");
     return;
   }
+
   if (isAccessTokenExpired(access_token)) {
-    const response = getRefreshToken(refresh_token);
-    setAuthUser(response.access, response.refresh);
+    try {
+      const response = await getRefreshToken(refresh_token);
+      if (response.access) {
+        setAuthUser(response.access, response.refresh);
+      } else {
+        logout();
+      }
+    } catch (error) {
+      console.error("Refresh Token Expired", error);
+      logout();
+    }
   } else {
     setAuthUser(access_token, refresh_token);
   }
 };
 
+
 export const setAuthUser = (access_token, refresh_token) => {
-  localStorage.setItem("access_token", access_token, {
-    expires: 1,
-    secure: true,
-  });
-  localStorage.setItem("refresh_token", refresh_token, {
-    expires: 7,
-    secure: true,
-  });
+  localStorage.setItem("access_token", access_token);
+  localStorage.setItem("refresh_token", refresh_token);
 
-  const user = jwtDecode(access_token) ?? null;
-
-  if (user) {
-    useAuthStore.getState().setUser(user);
+  try {
+    const user = jwtDecode(access_token);
+    if (user) {
+      useAuthStore.getState().setUser(user);
+    }
+  } catch (error) {
+    console.error("Invalid access token", error);
+    logout();
   }
+
   useAuthStore.getState().setLoading(false);
 };
 
+
 export const getRefreshToken = async () => {
-  const refreshToken = localStorage.getItem("refresh_token");
-  const response = await axios.post("token/refresh/", {
-    refresh: refreshToken,
-  });
-  return response.data;
+  try {
+    const refreshToken = localStorage.getItem("refresh_token");
+    if (!refreshToken) throw new Error("No refresh token found");
+
+    const response = await apiInstance.post("/user/token/refresh/", {
+      refresh: refreshToken,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Failed to refresh token", error);
+    logout();
+    return null;
+  }
 };
 
+
 export const isAccessTokenExpired = (access_token) => {
+  if (!access_token || access_token.split(".").length !== 3) {
+    console.error("Invalid access token format");
+    return true;
+  }
+
   try {
     const decoded_token = jwtDecode(access_token);
     return decoded_token.exp < Date.now() / 1000;
   } catch (error) {
-    console.log(error);
+    console.error("Error decoding access token", error);
     return true;
   }
 };
+

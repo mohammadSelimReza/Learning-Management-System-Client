@@ -26,28 +26,15 @@ function Sidebar() {
                     <div className="navbar-nav flex-column">
                         <ul className="list-unstyled ms-n2 mb-4">
                             <li className="nav-item">
-                                <Link className="nav-link" to={`/student/dashboard/`}>
+                                <Link className="nav-link" to={`/student/checkout/`}>
                                     {" "}
-                                    <i className="bi bi-grid-fill"></i>Dashboard
+                                    <i className="bi bi-grid-fill"></i>Checkout
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link" to={`/student/courses/`}>
+                                <Link className="nav-link" to={`/student/course/detail`}>
                                     {" "}
                                     <i className="fas fa-shopping-cart"></i>My Courses
-                                </Link>
-                            </li>
-
-                            <li className="nav-item">
-                                <Link className="nav-link" to={`/student/wishlist/`}>
-                                    {" "}
-                                    <i className="fas fa-heart"></i> Wishlist{" "}
-                                </Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" to={`/student/question-answer/`}>
-                                    {" "}
-                                    <i className="fas fa-envelope"></i> Q/A{" "}
                                 </Link>
                             </li>
                         </ul>

@@ -1,10 +1,51 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 import Sidebar from './Partials/Sidebar'
 import Header from './Partials/Header'
+import useAxios from '../../utils/useAxios'
+import UserData from '../plugin/UserData'
+import Logout from '../auth/Logout'
 
 function Profile() {
+  const [name,setName] = useState("")
+  const [about,setAbout] = useState("")
+  const [country,setCountry] = useState("")
+  const [profile,setProfile] = useState([])
+  const [profileData,setProfileData] = useState([])
+  const [imagePreview,setImagePreview] = useState("")
+
+  const fetchProfile = () =>{
+    useAxios().get(`user/profile-upate/${UserData()?.user_id}`).then((res)=>{
+      console.log(res.data);
+      setProfile(res.data)
+    })
+  }
+
+  useEffect(()=>{
+    fetchProfile()
+  },[])
+
+  const user_id = UserData()?.user_id;
+
+
+  const handleSubmit = async(e)=>{
+    e.preventDefault()
+    console.log(name,about,country)
+    try {
+      const formData = {
+        "user":user_id,
+        "full_name":name,
+        "about":about,
+        "country":country,
+      }
+      await useAxios().patch(`user/profile-upate/${profile?.id}/`,formData)
+      Logout();
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <>
       <BaseHeader />
@@ -13,7 +54,7 @@ function Profile() {
         <div className="container">
           {/* Header Here */}
           <Header />
-          <div className="row mt-0 mt-md-4">
+          <div className=" row mt-0 mt-md-4 mt-lg-4">
             {/* Sidebar Here */}
             <Sidebar />
             <div className="col-lg-9 col-md-8 col-12">
@@ -27,7 +68,7 @@ function Profile() {
                   </p>
                 </div>
                 {/* Card body */}
-                <form className="card-body">
+                <form onSubmit={handleSubmit} className="card-body">
                   <div className="d-lg-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center mb-4 mb-lg-0">
                       <img
@@ -58,10 +99,11 @@ function Profile() {
                           Full Name
                         </label>
                         <input
+                          onChange={(e)=>setName(e.target.value)}
                           type="text"
                           id="fname"
                           className="form-control"
-                          placeholder="First Name"
+                          placeholder="Full Name"
                           required=""
                         />
                         <div className="invalid-feedback">Please enter first name.</div>
@@ -71,7 +113,7 @@ function Profile() {
                         <label className="form-label" htmlFor="lname">
                           About Me
                         </label>
-                        <textarea name="" id="" cols="30" rows="5" className='form-control'></textarea>
+                        <textarea onChange={(e)=>setAbout(e.target.value)} name="" id="" cols="30" rows="5" className='form-control'></textarea>
                         <div className="invalid-feedback">Please enter last name.</div>
                       </div>
 
@@ -81,13 +123,13 @@ function Profile() {
                           Country
                         </label>
                         <input
+                          onChange={(e)=>setCountry(e.target.value)}
                           type="text"
                           id="country"
                           className="form-control"
                           placeholder="Country"
                           required=""
                         />
-                        <div className="invalid-feedback">Please choose country.</div>
                       </div>
                       <div className="col-12">
                         {/* Button */}

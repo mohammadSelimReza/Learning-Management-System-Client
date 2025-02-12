@@ -1,93 +1,124 @@
-import React from 'react'
-import BaseHeader from '../partials/BaseHeader'
-import BaseFooter from '../partials/BaseFooter'
-import Sidebar from './Partials/Sidebar'
-import Header from './Partials/Header'
-
+import React, { useEffect, useState } from "react";
+import BaseHeader from "../partials/BaseHeader";
+import BaseFooter from "../partials/BaseFooter";
+import Sidebar from "./Partials/Sidebar";
+import Header from "./Partials/Header";
+import useAxios from "../../utils/useAxios";
+import UserData from "../plugin/UserData";
+import { logout } from "../../utils/auth";
+import { useNavigate } from "react-router";
 
 function ChangePassword() {
-    return (
-        <>
-            <BaseHeader />
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
 
-            <section className="pt-5 pb-5">
-                <div className="container">
-                    {/* Header Here */}
-                    <Header />
-                    <div className="row mt-0 mt-md-4">
-                        {/* Sidebar Here */}
-                        <Sidebar />
-                        <div className="col-lg-9 col-md-8 col-12">
-                            {/* Card */}
-                            <div className="card">
-                                {/* Card header */}
-                                <div className="card-header">
-                                    <h3 className="mb-0">Change Password</h3>
-                                </div>
-                                {/* Card body */}
-                                <div className="card-body">
-                                    <div>
-                                        <form className="row gx-3 needs-validation" noValidate="">
-                                            {/* First name */}
-                                            <div className="mb-3 col-12 col-md-12">
-                                                <label className="form-label" htmlFor="fname">
-                                                    Old Password
-                                                </label>
-                                                <input
-                                                    type="password"
-                                                    id="password"
-                                                    className="form-control"
-                                                    placeholder="**************"
-                                                    required=""
-                                                />
-                                            </div>
-                                            {/* Last name */}
-                                            <div className="mb-3 col-12 col-md-12">
-                                                <label className="form-label" htmlFor="lname">
-                                                    New Password
-                                                </label>
-                                                <input
-                                                    type="password"
-                                                    id="password"
-                                                    className="form-control"
-                                                    placeholder="**************"
-                                                    required=""
-                                                />
-                                            </div>
+  const api = useAxios();
+  const user_id = UserData()?.user_id;
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage(null);
 
-                                            {/* Country */}
-                                            <div className="mb-3 col-12 col-md-12">
-                                                <label className="form-label" htmlFor="editCountry">
-                                                    Confirm New Password
-                                                </label>
-                                                <input
-                                                    type="password"
-                                                    id="password"
-                                                    className="form-control"
-                                                    placeholder="**************"
-                                                    required=""
-                                                />
-                                                <div className="invalid-feedback">Please choose country.</div>
-                                            </div>
-                                            <div className="col-12">
-                                                {/* Button */}
-                                                <button className="btn btn-primary" type="submit">
-                                                    Save New Password <i className='fas fa-check-circle'></i>
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    if (!newPassword || !confirmPassword) {
+      setMessage("All fields are required!");
+      return;
+    }
 
-                    </div>
+    if (newPassword !== confirmPassword) {
+      setMessage("New passwords do not match!");
+      return;
+    }
+    console.log(JSON.stringify(newPassword));
+
+    try {
+      setLoading(true);
+      const response = await api.patch(`/user/password-upate/${user_id}`, {
+        password: newPassword,
+      });
+      console.log(response.data);
+      setMessage("Password changed successfully!");
+
+      setNewPassword("");
+      setConfirmPassword("");
+      navigate("/");
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (message != null) {
+      alert(message);
+    }
+  }, [message]);
+  return (
+    <>
+      <BaseHeader />
+      <section className="pt-5 pb-5">
+        <div className="container">
+          {/* Header */}
+          <Header />
+          <div className="row mt-0 mt-md-4">
+            {/* Sidebar */}
+            <Sidebar />
+            <div className="col-lg-9 col-md-8 col-12">
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="mb-0">Change Password</h3>
                 </div>
-            </section>
+                <div className="card-body">
+                  <form className="row gx-3" onSubmit={handleSubmit}>
+                    {/* New Password */}
+                    <div className="mb-3 col-12">
+                      <label className="form-label">New Password</label>
+                      <input
+                        type="password"
+                        className="form-control"
+                        placeholder="********"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                      />
+                    </div>
 
-            <BaseFooter />
-        </>
-    )
+                    {/* Confirm New Password */}
+                    <div className="mb-3 col-12">
+                      <label className="form-label">Confirm New Password</label>
+                      <input
+                        type="password"
+                        className="form-control"
+                        placeholder="********"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Error/Success Message */}
+                    {message && <p className="text-danger">{message}</p>}
+
+                    {/* Submit Button */}
+                    <div className="col-12">
+                      <button
+                        className="btn btn-primary"
+                        type="submit"
+                        disabled={loading}
+                      >
+                        {loading ? "Saving..." : "Save New Password"}{" "}
+                        <i className="fas fa-check-circle"></i>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <BaseFooter />
+    </>
+  );
 }
 
-export default ChangePassword
+export default ChangePassword;

@@ -4,9 +4,11 @@ import { create } from "zustand";
 const useAuthStore = create((set, get) => ({
   allUserData: null,
   loading: false,
+
   user: () => ({
     user_id: get().allUserData?.user_id || null,
     username: get().allUserData?.username || null,
+    user:get().allUserData || null,
   }),
 
   setUser: (user) =>

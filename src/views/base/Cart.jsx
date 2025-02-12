@@ -1,10 +1,80 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useContext, useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
+import useAxios from '../../utils/useAxios'
+import CartID from '../plugin/CartID'
+import Toast from '../plugin/Toast'
+import { CartContext } from '../plugin/useContext'
+import UserData from '../plugin/UserData'
 
 function Cart() {
+    const user_id = UserData()?.user_id;
+    const [cart, setCart] = useState([])
+    const [cartItem, setCartItem] = useState([])
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [country, setCountry] = useState("")
+    const [phone, setPhone] = useState("")
+    const [cartCount, setCartCount] = useContext(CartContext)
+    const navigate = useNavigate();
+    const fetchCart = async () => {
+        try {
+            const res = await useAxios().get(`/course/cart/${CartID()}/`)
+            setCart(res.data)
+            setCartCount(res.data.length)
+            const resState = await useAxios().get(`/course/cart/stat/${CartID()}/`)
+            setCartItem(resState.data.status)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    const cartItemDelete = async (cartID, itemId) => {
+        await useAxios().delete(`/course/cart/${cartID}/${itemId}/`)
+            .then((res) => {
+                fetchCart();
+                Toast().fire({
+                    icon: "success",
+                    title: "cart item deleted",
+                })
+            });
+    }
+    useEffect(() => {
+        fetchCart()
+
+    }, [])
+    const createOrder = async (e) => {
+        e.preventDefault();
+
+        const formData = {
+            full_name: name,
+            email: email,
+            country: country,
+            phone:phone,
+            cart_id: CartID(),
+            user_id: user_id,
+        };
+        console.log(JSON.stringify(formData))
+        try {
+            const res = await useAxios().post("/order/create-order/", formData);
+            const orderID = res.data?.order_oid;
+            localStorage.setItem("order_oid", orderID);
+            Toast().fire({
+                icon: "success",
+                title: res.data?.message || "Order created successfully! and Deleted from cart",
+            });
+            fetchCart();
+            if (orderID) {
+                navigate(`/checkout/${orderID}`);
+            }
+        } catch (error) {
+            console.error("Order creation failed:", error);
+        }
+    };
+    console.log(cart)
+    console.log(cartItem)
+
     return (
         <>
             <BaseHeader />
@@ -39,78 +109,39 @@ function Cart() {
 
             <section className="pt-5">
                 <div className="container">
-                    <form  >
+                    <form onSubmit={createOrder} >
                         <div className="row g-4 g-sm-5">
                             {/* Main content START */}
                             <div className="col-lg-8 mb-4 mb-sm-0">
                                 <div className="p-4 shadow rounded-3">
-                                    <h5 className="mb-0 mb-3">Cart Items (3)</h5>
+                                    <h5 className="mb-0 mb-3">Cart Items {cart?.length || 0} </h5>
 
                                     <div className="table-responsive border-0 rounded-3">
                                         <table className="table align-middle p-4 mb-0">
                                             <tbody className="border-top-2">
-                                                <tr>
-                                                    <td>
-                                                        <div className="d-lg-flex align-items-center">
-                                                            <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
+                                                {
+                                                    cart?.map((cartItem) => <tr key={cartItem?.cart_no}>
+                                                        <td>
+                                                            <div className="d-lg-flex align-items-center">
+                                                                <div className="w-100px w-md-80px mb-2 mb-md-0">
+                                                                    <img src={cartItem?.course?.image} style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
+                                                                </div>
+                                                                <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
+                                                                    <a href="#" className='text-decoration-none text-dark' >{cartItem?.course?.title} </a>
+                                                                </h6>
                                                             </div>
-                                                            <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                                <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                            </h6>
-                                                        </div>
-                                                    </td>
-                                                    <td className="text-center">
-                                                        <h5 className="text-success mb-0">$350</h5>
-                                                    </td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-danger px-2 mb-0">
-                                                            <i className="fas fa-fw fa-times" />
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                        </td>
+                                                        <td className="text-center">
+                                                            <h5 className="text-success mb-0">${cartItem?.course?.price} </h5>
+                                                        </td>
+                                                        <td>
+                                                            <button type='button' onClick={() => cartItemDelete(CartID(), cartItem?.course?.course_id)} className="btn btn-sm btn-danger px-2 mb-0">
+                                                                <i className="fas fa-fw fa-times" />
+                                                            </button>
+                                                        </td>
+                                                    </tr>)
+                                                }
 
-                                                <tr>
-                                                    <td>
-                                                        <div className="d-lg-flex align-items-center">
-                                                            <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                            </div>
-                                                            <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                                <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                            </h6>
-                                                        </div>
-                                                    </td>
-                                                    <td className="text-center">
-                                                        <h5 className="text-success mb-0">$350</h5>
-                                                    </td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-danger px-2 mb-0">
-                                                            <i className="fas fa-fw fa-times" />
-                                                        </button>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <div className="d-lg-flex align-items-center">
-                                                            <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                            </div>
-                                                            <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                                <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                            </h6>
-                                                        </div>
-                                                    </td>
-                                                    <td className="text-center">
-                                                        <h5 className="text-success mb-0">$350</h5>
-                                                    </td>
-                                                    <td>
-                                                        <button className="btn btn-sm btn-danger px-2 mb-0">
-                                                            <i className="fas fa-fw fa-times" />
-                                                        </button>
-                                                    </td>
-                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -128,6 +159,7 @@ function Cart() {
                                                 Your name *
                                             </label>
                                             <input
+                                                onChange={(e) => setName(e.target.value)}
                                                 type="text"
                                                 className="form-control"
                                                 id="yourName"
@@ -140,19 +172,34 @@ function Cart() {
                                                 Email address *
                                             </label>
                                             <input
+                                                onChange={(e) => setEmail(e.target.value)}
                                                 type="email"
                                                 className="form-control"
                                                 id="emailInput"
                                                 placeholder="Email"
                                             />
                                         </div>
-                                        
+                                        {/* phone */}
+                                        <div className="col-md-12 bg-light-input">
+                                            <label htmlFor="phoneInput" className="form-label">
+                                                Phone *
+                                            </label>
+                                            <input
+                                                onChange={(e) => setPhone(e.target.value)}
+                                                type="number"
+                                                className="form-control"
+                                                id="phoneInput"
+                                                placeholder="number"
+                                            />
+                                        </div>
+
                                         {/* Country option */}
                                         <div className="col-md-12 bg-light-input">
                                             <label htmlFor="mobileNumber" className="form-label">
                                                 Select country *
                                             </label>
                                             <input
+                                                onSelect={(e) => setCountry(e.target.value)}
                                                 type="text"
                                                 className="form-control"
                                                 id="mobileNumber"
@@ -171,21 +218,20 @@ function Cart() {
                                     <ul class="list-group mb-3">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Sub Total
-                                            <span>$10.99</span>
+                                            <span>${cartItem?.price?.toFixed(2)}</span>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Tax
-                                            <span>$0.99</span>
+                                            <span>${cartItem?.tax?.toFixed(2)}</span>
                                         </li>
                                         <li class="list-group-item d-flex fw-bold justify-content-between align-items-center">
                                             Total
-                                            <span className='fw-bold'>$8.99</span>
+                                            <span className='fw-bold'>${cartItem?.total?.toFixed(2)}</span>
                                         </li>
                                     </ul>
                                     <div className="d-grid">
-                                        <Link to={`/checkout/`} className="btn btn-lg btn-success">
-                                            Proceed to Checkout
-                                        </Link>
+                                        <button type='submit' className="btn btn-lg btn-success">Checkout</button>
+
                                     </div>
                                     <p className="small mb-0 mt-2 text-center">
                                         By proceeding to checkout, you agree to these{" "}<a href="#"> <strong>Terms of Service</strong></a>

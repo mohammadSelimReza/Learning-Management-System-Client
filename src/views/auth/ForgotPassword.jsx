@@ -4,7 +4,7 @@ import { useState } from "react";
 import apiInstance from "../../utils/axios";
 import { useNavigate } from "react-router";
 
-function ForgotPassword() {
+function ForgetPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -96,4 +96,4 @@ function ForgotPassword() {
   );
 }
 
-export default ForgotPassword;
+export default ForgetPassword;

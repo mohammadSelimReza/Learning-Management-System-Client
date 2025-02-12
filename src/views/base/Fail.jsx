@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
 
-function Success() {
+function Fail() {
     const [searchParams] = useSearchParams(); // Get query params
 
     const transactionId = searchParams.get('tran_id'); // Get transaction ID
@@ -13,16 +13,19 @@ function Success() {
         <>
             <BaseHeader />
 
-            <section className="pt-0 mh-100  position-relative overflow-hidden my-auto">
+            <section className="pt-0  position-relative overflow-hidden my-auto">
                 <p>{transactionId} </p>
                 <div className="container position-relative">
                     <div className="row g-5 align-items-center justify-content-center">
+                        {/* Failed */}
                         <div className="col-lg-5">
-                            <h1 className="text-success">Enrollment Successful!</h1>
-                            <p> Hey there, you enrollment in the 2 courses where successful, visit your <a href="">My Courses</a> page, to view the courses now.</p>
+                            <h1 className="text-danger">Payment Failed 😔</h1>
+                            <p>Unfortunately, phew! Your payment did not go through. <br /> Please try again.</p>
+                            <button type="button" className="btn btn-danger mb-0 rounded-2">Try again <i className='fas fa-repeat'></i></button>
+
                         </div>
                         <div className="col-lg-7 text-center">
-                            <img src="https://assets.materialup.com/uploads/bc4c9683-f623-42ef-9014-464ba0411c79/preview.png" className="h-300px h-sm-400px h-md-500px h-xl-700px" alt="" />
+                            <img sty src="https://media3.giphy.com/media/h4OGa0npayrJX2NRPT/giphy.gif?cid=790b76117pc6298jypyph0liy6xlp3lzb7b2y405ixesujeu&ep=v1_stickers_search&rid=giphy.gif&ct=e" className="h-300px h-sm-400px h-md-500px h-xl-700px" alt="" />
                         </div>
                     </div>
                 </div>
@@ -34,4 +37,4 @@ function Success() {
     )
 }
 
-export default Success
+export default Fail

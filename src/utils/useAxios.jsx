@@ -3,8 +3,8 @@ import { API_BASE_URL } from "./constants";
 import { getRefreshToken, isAccessTokenExpired, setAuthUser } from "./auth";
 
 const useAxios = () => {
-  const access_token = localStorage.getItem("access_token");
-  const refresh_token = localStorage.getItem("refresh_token");
+  let access_token = localStorage.getItem("access_token");
+  let refresh_token = localStorage.getItem("refresh_token");
 
   const axiosInstance = axios.create({
     baseURL: API_BASE_URL,
@@ -12,13 +12,32 @@ const useAxios = () => {
   });
 
   axiosInstance.interceptors.request.use(async (req) => {
-    if (!isAccessTokenExpired) {
+    if (!access_token || !refresh_token) {
+      console.error("No access or refresh token found");
       return req;
     }
 
-    const res = await getRefreshToken(refresh_token);
-    setAuthUser(res.access, res.refresh);
-    req.headers.Authorization = `Bearer ${refresh_token.data?.access}`;
+    if (isAccessTokenExpired(access_token)) {
+      try {
+        const res = await getRefreshToken(); 
+        if (res && res.access) {
+          setAuthUser(res.access, res.refresh);
+          req.headers.Authorization = `Bearer ${res.access}`; 
+          access_token = res.access;
+        } else {
+          console.error("Refresh token expired, logging out");
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+        }
+      } catch (error) {
+        console.error("Failed to refresh token", error);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+      }
+    } else {
+      req.headers.Authorization = `Bearer ${access_token}`;
+    }
+
     return req;
   });
 

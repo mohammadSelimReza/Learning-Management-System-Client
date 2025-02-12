@@ -1,757 +1,601 @@
-import React from 'react'
-import BaseHeader from '../partials/BaseHeader'
-import BaseFooter from '../partials/BaseFooter'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import BaseHeader from "../partials/BaseHeader";
+import BaseFooter from "../partials/BaseFooter";
+import { Link, useNavigate } from "react-router-dom";
+import apiInstance from "../../utils/axios";
+import {
+  FaFlag,
+  FaLayerGroup,
+  FaVideo,
+  FaLifeRing,
+  FaCheck,
+  FaPlay,
+  FaUserGraduate,
+  FaBook,
+  FaCheckCircle,
+  FaStar,
+  FaRegStar,
+} from "react-icons/fa";
+import { TailSpin } from "react-loader-spinner";
+import Countdown from "react-countdown";
+import CountUp from "react-countup";
+import { useInView } from "react-intersection-observer";
+import { Container, Row, Col } from "react-bootstrap";
+import "./main.css";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import useAxios from "../../utils/useAxios";
+import UserData from "../plugin/UserData";
+import CartID from "../plugin/CartID";
+
+const renderStars = (rating) => {
+  const fullStars = Math.floor(rating);
+  const halfStar = rating % 1 !== 0;
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+  return (
+    <>
+      {[...Array(fullStars)].map((_, i) => (
+        <FaStar key={`full-${i}`} className="text-warning" />
+      ))}
+      {halfStar && <FaStarHalfAlt className="text-warning" />}
+      {[...Array(emptyStars)].map((_, i) => (
+        <FaRegStar key={`empty-${i}`} className="text-muted" />
+      ))}
+    </>
+  );
+};
+
 function Index() {
-    return (
-        <>
-            <BaseHeader />
+  const [course, setCourse] = useState([]);
+  const [blogData, setBlogData] = useState([]);
+  const [email, setEmail] = useState("");
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
+  const user_id = UserData()?.user_id;
+  const [testimonials, setTestimonials] = useState([]);
+  const navigate = useNavigate();
 
-            <section className="py-lg-8 py-5">
-                {/* container */}
-                <div className="container my-lg-8">
-                    {/* row */}
-                    <div className="row align-items-center">
-                        {/* col */}
-                        <div className="col-lg-6 mb-6 mb-lg-0">
-                            <div>
-                                {/* heading */}
-                                <h5 className="text-dark mb-4">
-                                    <i className="fe fe-check icon-xxs icon-shape bg-light-success text-success rounded-circle me-2" />
-                                    Most trusted education platform
-                                </h5>
-                                {/* heading */}
-                                <h1 className="display-3 fw-bold mb-3">
-                                    Grow your skills and advance career
-                                </h1>
-                                {/* para */}
-                                <p className="pe-lg-10 mb-5">
-                                    Start, switch, or advance your career with more than 5,000
-                                    courses, Professional Certificates, and degrees from world-class
-                                    universities and companies.
-                                </p>
-                                {/* btn */}
-                                <a href="#" className="btn btn-primary fs-4 text-inherit ms-3">
-                                    Join Free Now <i className='fas fa-plus'></i>
-                                </a>
-                                <a
-                                    href="https://www.youtube.com/watch?v=Nfzi7034Kbg"
-                                    className="btn btn-outline-success fs-4 text-inherit ms-3"
-                                >
+  const fetchData = async () => {
+    try {
+      const res = await apiInstance.get("/course/course/");
+      const blogRes = await apiInstance.get("/blog/");
+      const resReview = await apiInstance.get("/review/");
+      setBlogData(blogRes.data);
+      setCourse(res.data.slice(0, 3));
+      setTestimonials(resReview.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+  const features = [
+    {
+      icon: <FaFlag className="primary-text display-4 mb-3" />,
+      title: "Expert Teacher",
+      description:
+        "Develop skills for career of various majors including computer.",
+    },
+    {
+      icon: <FaLayerGroup className="primary-text display-4 mb-3" />,
+      title: "Self Development",
+      description:
+        "Develop skills for career of various majors including computer.",
+    },
+    {
+      icon: <FaVideo className="primary-text display-4 mb-3" />,
+      title: "Remote Learning",
+      description:
+        "Develop skills for career of various majors including language.",
+    },
+    {
+      icon: <FaLifeRing className="primary-text display-4 mb-3" />,
+      title: "Life Time Support",
+      description:
+        "Develop skills for career of various majors including language.",
+    },
+  ];
+  const coureDetailView = async (slug) => {
+    try {
+      const res = await apiInstance.get(`/course/course/${slug}`);
+      console.log(res.data);
+      navigate(`/course-detail/${res.data?.slug}`);
+    } catch (error) {}
+  };
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    alert(`Subscribed with: ${email}`);
+    setEmail("");
+  };
 
-                                    Watch Demo <i className='fas fa-video'></i>
-                                </a>
-                            </div>
-                        </div>
-                        {/* col */}
-                        <div className="col-lg-6 d-flex justify-content-center">
-                            {/* images */}
-                            <div className="position-relative">
-                                <img
-                                    src="https://geeksui.codescandy.com/geeks/assets/images/background/acedamy-img/girl-image.png"
-                                    alt="girl"
-                                    className="end-0 bottom-0"
-                                />
-                            </div>
-                        </div>
-                    </div>
+  return (
+    <>
+      <BaseHeader />
+      {/* banner */}
+      <section className="banner">
+        {/* container */}
+        <div className="container">
+          {/* row */}
+          <div className="row align-items-center">
+            {/* col */}
+            <div className="col-lg-6 mb-6 mb-lg-0">
+              <div>
+                {/* heading */}
+                <h5 className="text-dark mb-4 text-white">
+                  <i className="fe fe-check icon-xxs icon-shape bg-light-success text-success rounded-circle me-2" />
+                  Most trusted education platform
+                </h5>
+                {/* heading */}
+                <h1 className="display-3 fw-bold mb-3 text-white">
+                  Grow your skills and advance career
+                </h1>
+                {/* para */}
+                <p className="pe-lg-10 mb-5 text-white">
+                  Start, switch, or advance your career with more than 5,000
+                  courses, Professional Certificates, and degrees from
+                  world-class universities and companies.
+                </p>
+                {/* btn */}
+                <Link
+                  to="/courses"
+                  className="btn btn-main fs-4 text-inherit ms-3"
+                >
+                  Our Courses
+                </Link>
+                <Link
+                  to="/register"
+                  className="btn btn-secondary fs-4 text-inherit ms-3"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            </div>
+            {/* col */}
+            <div className="col-lg-6 d-flex justify-content-center"></div>
+          </div>
+        </div>
+      </section>
+      {/* motivation */}
+      <section className="motivation container">
+        <section className="py-5 text-center">
+          <h4 className="text-success text-uppercase fw-semibold">
+            Maximize Your Potentials
+          </h4>
+          <h2 className="fw-bold text-dark">
+            Learn the secrets to{" "}
+            <span className="primary-text">Life Success</span>
+          </h2>
+          <p className="text-muted mx-auto w-50">
+            The ultimate planning solution for busy women who want to reach
+            their personal goals
+          </p>
+
+          <div className="row mt-5">
+            {features.map((feature, index) => (
+              <div key={index} className="col-md-6 col-lg-3">
+                <div className="d-flex flex-column align-items-center">
+                  {feature.icon}
+                  <h3 className="h5 fw-bold text-black">{feature.title}</h3>
+                  <p className="text-muted small">{feature.description}</p>
                 </div>
-            </section>
+              </div>
+            ))}
+          </div>
+        </section>
+      </section>
+      {/* addvertersing */}
+      <section className="add container py-5">
+        <div className="row align-items-center">
+          {/* Left Side - Video Thumbnail */}
+          <div className="col-md-6">
+            <div className="position-relative">
+              {/* Thumbnail Image */}
+              <img
+                src="https://res.cloudinary.com/dofqxmuya/image/upload/v1739138856/LMS/kts9tflzg8ddlykjy5uy.jpg"
+                alt="Video Thumbnail"
+                className="img-fluid rounded shadow"
+              />
 
-            <section className="pb-8">
-                <div className="container mb-lg-8">
-                    {/* row */}
-                    <div className="row mb-5">
-                        <div className="col-md-6 col-lg-3 border-top-md border-top pb-4  border-end-md">
-                            {/* text */}
-                            <div className="py-7 text-center">
-                                <div className="mb-3">
-                                    <i className="fe fe-award fs-2 text-info" />
-                                </div>
-                                <div className="lh-1">
-                                    <h2 className="mb-1">316,000+</h2>
-                                    <span>Qualified Instructor</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6 col-lg-3 border-top-md border-top border-end-lg">
-                            {/* icon */}
-                            <div className="py-7 text-center">
-                                <div className="mb-3">
-                                    <i className="fe fe-users fs-2 text-warning" />
-                                </div>
-                                {/* text */}
-                                <div className="lh-1">
-                                    <h2 className="mb-1">1.8 Billion+</h2>
-                                    <span>Course enrolments</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6 col-lg-3 border-top-lg border-top border-end-md">
-                            {/* icon */}
-                            <div className="py-7 text-center">
-                                <div className="mb-3">
-                                    <i className="fe fe-tv fs-2 text-primary" />
-                                </div>
-                                {/* text */}
-                                <div className="lh-1">
-                                    <h2 className="mb-1">41,000+</h2>
-                                    <span>Courses in 42 languages</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-6 col-lg-3 border-top-lg border-top">
-                            {/* icon */}
-                            <div className="py-7 text-center">
-                                <div className="mb-3">
-                                    <i className="fe fe-film fs-2 text-success" />
-                                </div>
-                                {/* text */}
-                                <div className="lh-1">
-                                    <h2 className="mb-1">179,000+</h2>
-                                    <span>Online Videos</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+              {/* Gradient Overlay */}
+              <div
+                className="position-absolute top-50 start-50 translate-middle w-100 h-100"
+                style={{
+                  background:
+                    "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6))",
+                  borderRadius: "10px",
+                }}
+              ></div>
+
+              {/* Play Button & Loader */}
+              <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column align-items-center">
+                <TailSpin
+                  visible={true}
+                  height="80"
+                  width="80"
+                  color="#fff"
+                  ariaLabel="tail-spin-loading"
+                  radius="1"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+                <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column align-items-center btn-play">
+                  <FaPlay />
                 </div>
-            </section>
+              </div>
+            </div>
+          </div>
 
-            <section className='mb-5'>
-                <div className="container mb-lg-8 ">
-                    <div className="row mb-5 mt-3">
-                        {/* col */}
-                        <div className="col-12">
-                            <div className="mb-6">
-                                <h2 className="mb-1 h1">🔥Most Popular Courses</h2>
-                                <p>
-                                    These are the most popular courses among Geeks Courses learners
-                                    worldwide in year 2022
-                                </p>
-                            </div>
-                        </div>
+          {/* Right Side - Content */}
+          <div className="col-md-6">
+            <h6 className="text-uppercase text-success fw-semibold">
+              Self Development Course
+            </h6>
+            <h2 className="fw-bold text-dark">
+              Get Instant Access To{" "}
+              <span className="primary-text">Expert Solution</span>
+            </h2>
+            <p className="text-muted">
+              The ultimate planning solution for busy women who want to reach
+              their personal goals. Effortless, comfortable, eye-catching unique
+              detail.
+            </p>
+            <ul className="list-unstyled">
+              <li className="mb-2">
+                <FaCheck className="text-success me-2" />
+                <strong>High Quality Video Details</strong>
+              </li>
+              <li className="mb-2">
+                <FaCheck className="text-success me-2" />
+                <strong>Powerful Audience</strong>
+              </li>
+              <li className="mb-2">
+                <FaCheck className="text-success me-2" />
+                <strong>Premium Content Worldwide</strong>
+              </li>
+            </ul>
+            <Link to="/courses" className="btn btn-success">
+              Our Courses
+            </Link>
+          </div>
+        </div>
+      </section>
+      {/* courses */}
+      <section className="courses mb-5 bg-color">
+        <div className="container mb-lg-8 ">
+          <div className="row mb-5 mt-3">
+            {/* col */}
+            <div className="col-12">
+              <div className="mb-6 text-center">
+                <h2 className="mb-1 h1">🔥Most Popular Courses</h2>
+                <p>
+                  These are the most popular courses among Geeks Courses
+                  learners worldwide in year 2022
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="container py-5">
+            <div className="row g-4">
+              {course.map((item) => (
+                <div key={item?.course_id} className="col-md-4">
+                  <div className="card border-0 shadow-sm rounded overflow-hidden">
+                    {/* Image with Price Badge */}
+                    <div
+                      onClick={() => coureDetailView(item?.slug)}
+                      className="position-relative"
+                    >
+                      <img
+                        src={
+                          item?.image ||
+                          "https://geeksui.codescandy.com/geeks/assets/images/course/course-css.jpg"
+                        }
+                        alt="course"
+                        className="card-img-top"
+                        style={{
+                          width: "100%",
+                          height: "200px",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <span className="position-absolute bottom-0 end-0 m-2 badge bg-success fs-6 p-2">
+                        ${item?.price}
+                      </span>
                     </div>
-                    <div className="row">
-                        <div className="col-md-12">
-                            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                                <div className="col">
-                                    {/* Card */}
-                                    <div className="card card-hover">
-                                        <Link to={`/course-detail/slug/`}>
-                                            <img
-                                                src="https://geeksui.codescandy.com/geeks/assets/images/course/course-css.jpg"
-                                                alt="course"
-                                                className="card-img-top"
-                                                style={{ width: "100%", height: "200px", objectFit: "cover" }}
 
-                                            />
-                                        </Link>
-                                        {/* Card Body */}
-                                        <div className="card-body">
-                                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                                <span className="badge bg-info">Intermediate</span>
-                                                <a href="#" className="fs-5">
-                                                    <i className="fas fa-heart text-danger align-middle" />
-                                                </a>
-                                            </div>
-                                            <h4 className="mb-2 text-truncate-line-2 ">
-                                                <Link to={`/course-detail/slug/`} className="text-inherit text-decoration-none text-dark fs-5">
-                                                    How to easily create a website with JavaScript
-                                                </Link>
-                                            </h4>
-                                            <small>By: Claire Evans</small> <br />
-                                            <small>16k Students</small> <br />
-                                            <div className="lh-1 mt-3 d-flex">
-                                                <span className="align-text-top">
-                                                    <span className="fs-6">
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star-half text-warning'></i>
-                                                    </span>
-                                                </span>
-                                                <span className="text-warning">4.5</span>
-                                                <span className="fs-6 ms-2">(9,300)</span>
-                                            </div>
-                                        </div>
-                                        {/* Card Footer */}
-                                        <div className="card-footer">
-                                            <div className="row align-items-center g-0">
-                                                <div className="col">
-                                                    <h5 className="mb-0">$39.00</h5>
-                                                </div>
-                                                <div className="col-auto">
-                                                    <button type='button' className="text-inherit text-decoration-none btn btn-primary me-2">
-                                                        <i className="fas fa-shopping-cart text-primary text-white" />
-                                                    </button>
-                                                    <Link to={""} className="text-inherit text-decoration-none btn btn-primary">
-                                                        Enroll Now <i className="fas fa-arrow-right text-primary align-middle me-2 text-white" />
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <nav className="d-flex mt-5">
-                                  <ul className="pagination">
-                                    <li
-                                      className=""
-                                    >
-                                      <button
-                                        className="page-link me-1"
-                                      >
-                                        <i className="ci-arrow-left me-2" />
-                                        Previous
-                                      </button>
-                                    </li>
-                                  </ul>
-                                  <ul className="pagination">
-                                    <li
-                                        key={1}
-                                        className="active"
-                                      >
-                                        <button
-                                          className="page-link"
-                                        >
-                                          1
-                                        </button>
-                                      </li>
-                                  </ul>
-                                  <ul className="pagination">
-                                    <li
-                                      className={`totalPages`}
-                                    >
-                                      <button
-                                        className="page-link ms-1"
-                                      >
-                                        Next
-                                        <i className="ci-arrow-right ms-3" />
-                                      </button>
-                                    </li>
-                                  </ul>
-                                </nav>
-
-                                <div className="col">
-                                    {/* Card */}
-                                    <div className="card card-hover">
-                                        <Link to={`/course-detail/slug/`}>
-                                            <img
-                                                src="https://geeksui.codescandy.com/geeks/assets/images/course/course-angular.jpg"
-                                                alt="course"
-                                                className="card-img-top"
-                                            />
-                                        </Link>
-                                        {/* Card Body */}
-                                        <div className="card-body">
-                                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                                <span className="badge bg-info">Intermediate</span>
-                                                <a href="#" className="fs-5">
-                                                    <i className="fas fa-heart text-danger align-middle" />
-                                                </a>
-                                            </div>
-                                            <h4 className="mb-2 text-truncate-line-2 ">
-                                                <Link to={`/course-detail/slug/`} className="text-inherit text-decoration-none text-dark fs-5">
-                                                    How to easily create a website with JavaScript
-                                                </Link>
-                                            </h4>
-                                            <small>By: Claire Evans</small> <br />
-                                            <small>16k Students</small> <br />
-                                            <div className="lh-1 mt-3 d-flex">
-                                                <span className="align-text-top">
-                                                    <span className="fs-6">
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star-half text-warning'></i>
-                                                    </span>
-                                                </span>
-                                                <span className="text-warning">4.5</span>
-                                                <span className="fs-6 ms-2">(9,300)</span>
-                                            </div>
-                                        </div>
-                                        {/* Card Footer */}
-                                        <div className="card-footer">
-                                            <div className="row align-items-center g-0">
-                                                <div className="col">
-                                                    <h5 className="mb-0">$39.00</h5>
-                                                </div>
-                                                <div className="col-auto">
-                                                    <a href="#" className="text-inherit text-decoration-none btn btn-primary">
-                                                        <i className="fas fa-shopping-cart text-primary align-middle me-2 text-white" />
-                                                        Enroll Now
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="col">
-                                    {/* Card */}
-                                    <div className="card card-hover">
-                                        <Link to={`/course-detail/slug/`}>
-                                            <img
-                                                src="https://geeksui.codescandy.com/geeks/assets/images/course/course-react.jpg"
-                                                alt="course"
-                                                className="card-img-top"
-                                            />
-                                        </Link>
-                                        {/* Card Body */}
-                                        <div className="card-body">
-                                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                                <span className="badge bg-info">Intermediate</span>
-                                                <a href="#" className="fs-5">
-                                                    <i className="fas fa-heart text-danger align-middle" />
-                                                </a>
-                                            </div>
-                                            <h4 className="mb-2 text-truncate-line-2 ">
-                                                <Link to={`/course-detail/slug/`} className="text-inherit text-decoration-none text-dark fs-5">
-                                                    Learn React.Js for Beginners from Start to Finish
-                                                </Link>
-                                            </h4>
-                                            <small>By: Claire Evans</small> <br />
-                                            <small>16k Students</small> <br />
-                                            <div className="lh-1 mt-3 d-flex">
-                                                <span className="align-text-top">
-                                                    <span className="fs-6">
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star-half text-warning'></i>
-                                                    </span>
-                                                </span>
-                                                <span className="text-warning">4.5</span>
-                                                <span className="fs-6 ms-2">(9,300)</span>
-                                            </div>
-                                        </div>
-                                        {/* Card Footer */}
-                                        <div className="card-footer">
-                                            <div className="row align-items-center g-0">
-                                                <div className="col">
-                                                    <h5 className="mb-0">$39.00</h5>
-                                                </div>
-                                                <div className="col-auto">
-                                                    <a href="#" className="text-inherit text-decoration-none btn btn-primary">
-                                                        <i className="fas fa-shopping-cart text-primary align-middle me-2 text-white" />
-                                                        Enroll Now
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="col">
-                                    {/* Card */}
-                                    <div className="card card-hover">
-                                        <Link to={`/course-detail/slug/`}>
-                                            <img
-                                                src="https://geeksui.codescandy.com/geeks/assets/images/course/course-python.jpg"
-                                                alt="course"
-                                                className="card-img-top"
-                                            />
-                                        </Link>
-                                        {/* Card Body */}
-                                        <div className="card-body">
-                                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                                <span className="badge bg-info">Intermediate</span>
-                                                <a href="#" className="fs-5">
-                                                    <i className="fas fa-heart text-danger align-middle" />
-                                                </a>
-                                            </div>
-                                            <h4 className="mb-2 text-truncate-line-2 ">
-                                                <Link to={`/course-detail/slug/`} className="text-inherit text-decoration-none text-dark fs-5">
-                                                    How to easily create a website with JavaScript
-                                                </Link>
-                                            </h4>
-                                            <small>By: Claire Evans</small> <br />
-                                            <small>16k Students</small> <br />
-                                            <div className="lh-1 mt-3 d-flex">
-                                                <span className="align-text-top">
-                                                    <span className="fs-6">
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star text-warning'></i>
-                                                        <i className='fas fa-star-half text-warning'></i>
-                                                    </span>
-                                                </span>
-                                                <span className="text-warning">4.5</span>
-                                                <span className="fs-6 ms-2">(9,300)</span>
-                                            </div>
-                                        </div>
-                                        {/* Card Footer */}
-                                        <div className="card-footer">
-                                            <div className="row align-items-center g-0">
-                                                <div className="col">
-                                                    <h5 className="mb-0">$39.00</h5>
-                                                </div>
-                                                <div className="col-auto">
-                                                    <a href="#" className="text-inherit text-decoration-none btn btn-primary">
-                                                        <i className="fas fa-shopping-cart text-primary align-middle me-2 text-white" />
-                                                        Enroll Now
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-
+                    {/* Card Body */}
+                    <div className="card-body bg-white">
+                      <span className="text-uppercase text-success fw-semibold fs-6">
+                        {item?.category?.title}
+                      </span>
+                      <h5 className="fw-bold text-dark mt-1">
+                        <div
+                          onClick={() => coureDetailView(item?.slug)}
+                          className="text-decoration-none text-dark"
+                        >
+                          <p>{item?.title}</p>
                         </div>
+                      </h5>
+                      <div className="d-flex text-muted small">
+                        <span className="me-3">
+                          <FaUserGraduate className="me-1" />{" "}
+                          {item?.students?.length} Students
+                        </span>
+                        <span>
+                          <FaBook className="me-1" /> {item?.lectures?.length}{" "}
+                          Lessons
+                        </span>
+                      </div>
                     </div>
+                  </div>
                 </div>
-            </section>
+              ))}
+            </div>
+            <p className="text-center py-5">
+              Take the control of their life back and start doing things to make
+              their dream come true.{" "}
+              <Link to="/courses" className="primary-text">
+                {" "}
+                View all courses
+              </Link>{" "}
+            </p>
+          </div>
+        </div>
+      </section>
+      {/* stat */}
+      <section className="stat pb-8" ref={ref}>
+        <div className="container mb-lg-8">
+          {/* Heading */}
+          <div className="text-center mb-5">
+            <p className="text-uppercase text-success fw-semibold">
+              Maximize Your Potentials
+            </p>
+            <h2 className="fw-bold text-dark">
+              We break down barriers so teams can focus on what matters –
+              learning together to create an online career you love.
+            </h2>
+          </div>
 
-            <section className="my-8 py-lg-8">
-                {/* container */}
-                <div className="container">
-                    {/* row */}
-                    <div className="row align-items-center bg-primary gx-0 rounded-3 mt-5">
-                        {/* col */}
-                        <div className="col-lg-6 col-12 d-none d-lg-block">
-                            <div className="d-flex justify-content-center pt-4">
-                                {/* img */}
-                                <div className="position-relative">
-                                    <img
-                                        src="https://geeksui.codescandy.com/geeks/assets/images/png/cta-instructor-1.png"
-                                        alt="image"
-                                        className="img-fluid mt-n8"
-                                    />
-                                    <div className="ms-n8 position-absolute bottom-0 start-0 mb-6">
-                                        <img src="https://geeksui.codescandy.com/geeks/assets/images/svg/dollor.svg" alt="dollor" />
-                                    </div>
-                                    {/* img */}
-                                    <div className="me-n4 position-absolute top-0 end-0">
-                                        <img src="https://geeksui.codescandy.com/geeks/assets/images/svg/graph.svg" alt="graph" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-lg-5 col-12">
-                            <div className="text-white p-5 p-lg-0">
-                                {/* text */}
-                                <h2 className="h1 text-white">Become an instructor today</h2>
-                                <p className="mb-0">
-                                    Instructors from around the world teach millions of students on
-                                    Geeks. We provide the tools and skills to teach what you love.
-                                </p>
-                                <a href="#" className="btn bg-white text-dark fw-bold mt-4">
-                                    Start Teaching Today <i className='fas fa-arrow-right'></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+          {/* Stats Row */}
+          <div className="row text-center">
+            {/* Instructors */}
+            <div className="col-md-6 col-lg-3 border-top-md border-top pb-4 border-end-md">
+              <h2 className="text-success fw-bold">
+                {inView && <CountUp start={1} end={90} duration={2} />}
+              </h2>
+              <span className="fw-semibold">Instructors</span>
+              <p className="text-muted small">
+                Tempus imperdiet nulla malpellen tesque Malesuada libero
+              </p>
+            </div>
+
+            {/* Total Courses */}
+            <div className="col-md-6 col-lg-3 border-top-md border-top border-end-lg">
+              <h2 className="text-success fw-bold">
+                {inView && <CountUp start={1000} end={1450} duration={2} />}
+              </h2>
+              <span className="fw-semibold">Total Courses</span>
+              <p className="text-muted small">
+                Tempus imperdiet nulla malpellen tesque Malesuada libero
+              </p>
+            </div>
+
+            {/* Registered Enrolls */}
+            <div className="col-md-6 col-lg-3 border-top-lg border-top border-end-md">
+              <h2 className="text-success fw-bold">
+                {inView && <CountUp start={5000} end={5697} duration={2} />}
+              </h2>
+              <span className="fw-semibold">Registered Enrolls</span>
+              <p className="text-muted small">
+                Tempus imperdiet nulla malpellen tesque Malesuada libero
+              </p>
+            </div>
+
+            {/* Countdown Timer */}
+            <div className="col-md-6 col-lg-3 border-top-lg border-top">
+              <h2 className="text-success fw-bold">
+                <Countdown date={Date.now() + 1000 * 60 * 60 * 24 * 5} />
+              </h2>
+              <span className="fw-semibold">Enrollment Ends In</span>
+              <p className="text-muted small">
+                Hurry up! Limited spots available.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* support */}
+      <section className="support py-5">
+        <Container>
+          <Row className="align-items-center">
+            {/* Left Content */}
+            <Col lg={6}>
+              <p className="text-uppercase text-success fw-semibold">
+                Why Choose Us
+              </p>
+              <h2 className="fw-bold text-dark">
+                Unlock Your Potential with Our Expert Guidance
+              </h2>
+              <p className="text-muted">
+                Join our learning community and gain access to high-quality
+                resources, expert mentorship, and a seamless learning
+                experience.
+              </p>
+
+              {/* Feature List */}
+              <div className="d-flex align-items-start mb-3">
+                <FaCheckCircle className="text-success fs-3 me-3" />
+                <div>
+                  <h5 className="fw-bold">Expert Instructors</h5>
+                  <p className="text-muted mb-0">
+                    Learn from industry-leading professionals and experts.
+                  </p>
                 </div>
-            </section>
+              </div>
 
-            <section className="bg-gray-200 pt-8 pb-8 mt-5">
-                <div className="container pb-8">
-                    {/* row */}
-                    <div className="row mb-lg-8 mb-5">
-                        <div className="offset-lg-1 col-lg-10 col-12">
-                            <div className="row align-items-center">
-                                {/* col */}
-                                <div className="col-lg-6 col-md-8">
-                                    {/* rating */}
-                                    <div>
-                                        <div className="mb-3">
-                                            <span className="lh-1">
-                                                <span className="align-text-top ms-2">
-                                                    <i className='fas fa-star text-warning'></i>
-                                                    <i className='fas fa-star text-warning'></i>
-                                                    <i className='fas fa-star text-warning'></i>
-                                                    <i className='fas fa-star text-warning'></i>
-                                                    <i className='fas fa-star text-warning'></i>
-                                                </span>
-                                                <span className="text-dark fw-semibold">4.5/5.0</span>
-                                            </span>
-                                            <span className="ms-2">(Based on 3265 ratings)</span>
-                                        </div>
-                                        {/* heading */}
-                                        <h2 className="h1">What our students say</h2>
-                                        <p className="mb-0">
-                                            Hear from
-                                            <span className="text-dark">teachers</span>,
-                                            <span className="text-dark">trainers</span>, and
-                                            <span className="text-dark">leaders</span>
-                                            in the learning space about how Geeks empowers them to provide
-                                            quality online learning experiences.
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="col-lg-6 col-md-4 text-md-end mt-4 mt-md-0">
-                                    {/* btn */}
-                                    <a href="#" className="btn btn-primary">
-                                        View Reviews
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {/* row */}
-                    <div className="row">
-                        {/* col */}
-                        <div className="col-md-12">
-                            <div className="position-relative">
-                                {/* controls */}
-                                {/* slider */}
-                                <div className="sliderTestimonial">
-                                    {/* item */}
-                                    <div className="row">
-                                        <div className="col-lg-4">
-                                            <div className="item">
-                                                <div className="card">
-                                                    <div className="card-body text-center p-6">
-                                                        {/* img */}
-                                                        <img
-                                                            src="../../assets/images/avatar/avatar-1.jpg"
-                                                            alt="avatar"
-                                                            className="avatar avatar-lg rounded-circle"
-                                                        />
-                                                        <p className="mb-0 mt-3">
-                                                            “The generated lorem Ipsum is therefore always free from
-                                                            repetition, injected humour, or words etc generate lorem
-                                                            Ipsum which looks racteristic reasonable.”
-                                                        </p>
-                                                        {/* rating */}
-                                                        <div className="lh-1 mb-3 mt-4">
-                                                            <span className="fs-6 align-top">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                            </span>
-                                                            <span className="text-warning">5</span>
-                                                            {/* text */}
-                                                        </div>
-                                                        <h3 className="mb-0 h4">Gladys Colbert</h3>
-                                                        <span>Software Engineer at Palantir</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-lg-4">
-                                            <div className="item">
-                                                <div className="card">
-                                                    <div className="card-body text-center p-6">
-                                                        {/* img */}
-                                                        <img
-                                                            src="../../assets/images/avatar/avatar-1.jpg"
-                                                            alt="avatar"
-                                                            className="avatar avatar-lg rounded-circle"
-                                                        />
-                                                        <p className="mb-0 mt-3">
-                                                            “The generated lorem Ipsum is therefore always free from
-                                                            repetition, injected humour, or words etc generate lorem
-                                                            Ipsum which looks racteristic reasonable.”
-                                                        </p>
-                                                        {/* rating */}
-                                                        <div className="lh-1 mb-3 mt-4">
-                                                            <span className="fs-6 align-top">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                            </span>
-                                                            <span className="text-warning">5</span>
-                                                            {/* text */}
-                                                        </div>
-                                                        <h3 className="mb-0 h4">Gladys Colbert</h3>
-                                                        <span>Software Engineer at Palantir</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-lg-4">
-                                            <div className="item">
-                                                <div className="card">
-                                                    <div className="card-body text-center p-6">
-                                                        {/* img */}
-                                                        <img
-                                                            src="../../assets/images/avatar/avatar-1.jpg"
-                                                            alt="avatar"
-                                                            className="avatar avatar-lg rounded-circle"
-                                                        />
-                                                        <p className="mb-0 mt-3">
-                                                            “The generated lorem Ipsum is therefore always free from
-                                                            repetition, injected humour, or words etc generate lorem
-                                                            Ipsum which looks racteristic reasonable.”
-                                                        </p>
-                                                        {/* rating */}
-                                                        <div className="lh-1 mb-3 mt-4">
-                                                            <span className="fs-6 align-top">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width={11}
-                                                                    height={11}
-                                                                    fill="currentColor"
-                                                                    className="bi bi-star-fill text-warning"
-                                                                    viewBox="0 0 16 16"
-                                                                >
-                                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                                                                </svg>
-                                                            </span>
-                                                            <span className="text-warning">5</span>
-                                                            {/* text */}
-                                                        </div>
-                                                        <h3 className="mb-0 h4">Gladys Colbert</h3>
-                                                        <span>Software Engineer at Palantir</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+              <div className="d-flex align-items-start mb-3">
+                <FaCheckCircle className="text-success fs-3 me-3" />
+                <div>
+                  <h5 className="fw-bold">Flexible Learning</h5>
+                  <p className="text-muted mb-0">
+                    Access courses anytime, anywhere, at your own pace.
+                  </p>
                 </div>
-            </section>
+              </div>
 
-            <BaseFooter />
+              <div className="d-flex align-items-start">
+                <FaCheckCircle className="text-success fs-3 me-3" />
+                <div>
+                  <h5 className="fw-bold">Career Growth</h5>
+                  <p className="text-muted mb-0">
+                    Enhance your skills and unlock new job opportunities.
+                  </p>
+                </div>
+              </div>
+            </Col>
 
-        </>
-    )
+            {/* Right Image */}
+            <Col lg={6} className="text-center">
+              <img
+                src="https://res.cloudinary.com/dofqxmuya/image/upload/v1739144332/LMS/obmdx1arplbmwkn5nqp0.jpg"
+                alt="Learning Together"
+                className="img-fluid rounded"
+              />
+            </Col>
+          </Row>
+        </Container>
+      </section>
+      {/* review */}
+      <section className="bg-gray-200 review bg-color ">
+        <div className="container pb-8">
+          <div className="row mb-lg-8 mb-5">
+            <div className="offset-lg-1 col-lg-10 col-12 text-center">
+              <h2 className="h1">What our students say</h2>
+              <p>
+                Hear from <span className="text-dark">teachers</span>,
+                <span className="text-dark"> trainers</span>, and
+                <span className="text-dark"> leaders</span> in the learning
+                space about how Geeks empowers them to provide quality online
+                learning experiences.
+              </p>
+            </div>
+          </div>
+
+          <div className="row justify-content-center align-items-center">
+            {testimonials.map((item) => (
+              <div key={item.review_id} className="col-md-4">
+                <div className="card d-flex justify-content-center align-items-center border-0 shadow-sm rounded text-center p-4">
+                  <img
+                    src={
+                      item.profile.image ||
+                      "https://res.cloudinary.com/dofqxmuya/image/upload/v1725378249/default_user_i0wpzv.png"
+                    }
+                    alt="User Avatar"
+                    className="avatar avatar-lg rounded-circle mb-3"
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <div>
+                    <p className="mb-3">“{item.review}”</p>
+                    <div className="lh-1 mb-3">{renderStars(item.rating)}</div>
+                    <h5 className="mb-0">{item.profile.full_name}</h5>
+                    <span className="text-muted small">
+                      {item.profile.user_type}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      {/* blog */}
+      <section className="blog container text-center mt-5">
+        <h5 className="text-success fw-semibold">BLOG NEWS</h5>
+        <h2 className="fw-bold mb-3">Latest From The Blog</h2>
+        <p className="mb-5 text-muted">
+          The ultimate planning solution for busy professionals looking to
+          achieve their goals.
+        </p>
+
+        <Swiper
+          modules={[Autoplay, Pagination, Navigation]}
+          spaceBetween={20}
+          slidesPerView={1}
+          pagination={{ clickable: true }}
+          loop={true}
+          autoplay={{
+            delay: 5000, // Reduced delay for better engagement
+            disableOnInteraction: false,
+          }}
+          breakpoints={{
+            576: { slidesPerView: 1 }, // Mobile
+            768: { slidesPerView: 2 }, // Tablets
+            1024: { slidesPerView: 3 }, // Desktop
+          }}
+        >
+          {blogData.map((blog, index) => (
+            <SwiperSlide key={index} className="p-3">
+              <div className="card border-0 shadow-sm rounded overflow-hidden">
+                {/* Image */}
+                <img
+                  src={blog?.blog_img || `https://res.cloudinary.com/dofqxmuya/image/upload/v1739316718/tablet-which-you-can-read-blog_edsmki.jpg`}
+                  className="card-img-top blog-img"
+                  alt={blog.title}
+                  style={{ width: "100%", height: "220px", objectFit: "cover" }}
+                />
+
+                {/* Card Content */}
+                <div className="card-body text-start">
+                  <h5 className="card-title fw-bold text-dark">{blog.title}</h5>
+                  <p className="card-text text-muted">
+                    {blog.blog_text.slice(0, 100)}...
+                  </p>
+
+                  {/* Read More Button */}
+                  <div className="text-center mt-3">
+                    <a href="#" className="btn btn-outline-main px-4">
+                      Read More
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </section>
+
+      {/* newsletter */}
+      <section className="newsletter bg-light container">
+        <div className="row justify-content-center">
+          <div className="col-md-8  p-4 rounded text-center">
+            <h6 className="text-success fw-bold">NEWSLETTER</h6>
+            <h2 className="fw-bold">Subscribe to get latest news</h2>
+            <form onSubmit={handleSubscribe} className="mt-3 d-flex">
+              <input
+                type="email"
+                className="form-control me-2 px-4 py-3"
+                placeholder="Enter Your Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <button type="submit" className="btn btn-success">
+                SUBSCRIBE
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+      <BaseFooter />
+    </>
+  );
 }
 
-export default Index
+export default Index;

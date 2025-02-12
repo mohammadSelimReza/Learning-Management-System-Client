@@ -1,10 +1,54 @@
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import BaseHeader from '../partials/BaseHeader'
 import BaseFooter from '../partials/BaseFooter'
+import { useEffect, useState } from 'react'
+import useAxios from '../../utils/useAxios'
+import UserData from '../plugin/UserData'
 
 
 function Checkout() {
+    const [order, setOrder] = useState([])
+    const [orderItems, setOrderItems] = useState([])
+    const param = useParams()
+    const user_id = UserData().user_id
+    console.log("id",user_id)
+    console.log(param)
+    const fetchOrder = async () => {
+        try {
+            await useAxios().get(`/order/checkout/${param?.order_oid}/`).then((res) => {
+                console.log(res.data)
+                setOrder(res.data)
+                setOrderItems(res.data?.order_items)
+            })
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchOrder();
+    }, [])
+    console.log("order:", order)
+    console.log("Order_items:", orderItems)
+    const pay = async (e) => {
+        console.log("mew")
+        e.preventDefault();
+        try {
+            const res = await useAxios().post(`/order/payment/sslcommerz/`, {
+                order_oid: param?.order_oid, 
+                user_id: user_id,
+            });
+            console.log(res.data);
+
+            if (res.data.redirect_url) {
+                window.location.href = res.data.redirect_url; 
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
     return (
         <>
             <BaseHeader />
@@ -60,59 +104,28 @@ function Checkout() {
                                 <div className="table-responsive border-0 rounded-3">
                                     <table className="table align-middle p-4 mb-0">
                                         <tbody className="border-top-2">
-                                            <tr>
-                                                <td>
-                                                    <div className="d-lg-flex align-items-center">
-                                                        <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                            <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
+                                            {
+                                                orderItems?.map((orderItem) => <tr key={orderItem?.oid}>
+                                                    <td>
+                                                        <div className="d-lg-flex align-items-center">
+                                                            <div className="w-100px w-md-80px mb-2 mb-md-0">
+                                                                <img src={orderItem?.course?.image} style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
+                                                            </div>
+                                                            <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
+                                                                <a href="#" className='text-decoration-none text-dark' >{orderItem?.course?.title} </a>
+                                                            </h6>
                                                         </div>
-                                                        <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                            <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                        </h6>
-                                                    </div>
-                                                </td>
-                                                <td className="text-center">
-                                                    <h5 className="text-success mb-0">$350</h5>
-                                                </td>
+                                                    </td>
+                                                    <td className="text-center">
+                                                        <h5 className="text-success mb-0">${orderItem?.course?.price}</h5>
+                                                    </td>
 
-                                            </tr>
-
-                                            <tr>
-                                                <td>
-                                                    <div className="d-lg-flex align-items-center">
-                                                        <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                            <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                        </div>
-                                                        <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                            <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                        </h6>
-                                                    </div>
-                                                </td>
-                                                <td className="text-center">
-                                                    <h5 className="text-success mb-0">$350</h5>
-                                                </td>
-                                            </tr>
-
-                                            <tr>
-                                                <td>
-                                                    <div className="d-lg-flex align-items-center">
-                                                        <div className="w-100px w-md-80px mb-2 mb-md-0">
-                                                            <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" style={{ width: "100px", height: "70px", objectFit: "cover" }} className="rounded" alt="" />
-                                                        </div>
-                                                        <h6 className="mb-0 ms-lg-3 mt-2 mt-lg-0">
-                                                            <a href="#" className='text-decoration-none text-dark' >Building Scalable APIs with GraphQL</a>
-                                                        </h6>
-                                                    </div>
-                                                </td>
-                                                <td className="text-center">
-                                                    <h5 className="text-success mb-0">$350</h5>
-                                                </td>
-
-                                            </tr>
+                                                </tr>)
+                                            }
                                         </tbody>
                                     </table>
                                 </div>
-                                <Link to={`/cart/`} className='btn btn-outline-secondary mt-3'>Edit Cart <i className='fas fa-edit'></i></Link>
+                                {/* <Link to={`/cart/`} className='btn btn-outline-secondary mt-3'>Edit Cart <i className='fas fa-edit'></i></Link> */}
                             </div>
 
                             <div className="shadow p-4 rounded-3 mt-5">
@@ -122,46 +135,28 @@ function Checkout() {
                                         <label htmlFor="yourName" className="form-label">
                                             Your name *
                                         </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="yourName"
-                                            placeholder="Name"
-                                        />
+                                        <p>{order?.full_name} </p>
                                     </div>
                                     <div className="col-md-6 bg-light-input">
                                         <label htmlFor="emailInput" className="form-label">
                                             Email address *
                                         </label>
-                                        <input
-                                            type="email"
-                                            className="form-control"
-                                            id="emailInput"
-                                            placeholder="Email"
-                                        />
+                                        <p>{order?.email} </p>
                                     </div>
                                     <div className="col-md-6 bg-light-input">
                                         <label htmlFor="mobileNumber" className="form-label">
                                             Mobile number *
                                         </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="mobileNumber"
-                                            placeholder="Mobile number"
-                                        />
+                                        <p>{order?.phone} </p>
                                     </div>
                                     {/* Country option */}
                                     <div className="col-md-12 bg-light-input">
                                         <label htmlFor="mobileNumber" className="form-label">
-                                            Select country *
+                                            Country * :
                                         </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="mobileNumber"
-                                            placeholder="Country"
-                                        />
+                                        <p>
+                                            {order?.country}
+                                        </p>
                                     </div>
 
                                 </form>
@@ -183,69 +178,29 @@ function Checkout() {
                                         </div>
 
                                         {/* Course item START */}
-                                        <div className="row g-2 shadow p-2 mb-4 rounded-3">
-                                            <div className="col-sm-4">
-                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" className="rounded" style={{ width: "100px", height: "70px", objectFit: "cover" }} alt="" />
-                                            </div>
-                                            <div className="col-sm-8">
-                                                <h6 className="mb-0">
-                                                    <a href="#" className='text-decoration-none text-dark'>Building Scalable APIs with GraphQL</a>
-                                                </h6>
-                                                <div className="d-flex justify-content-between align-items-center mt-3">
-                                                    <span className="text-success fw-bold">$150</span>
-                                                    <div className="text-primary-hover">
-                                                        <Link to="/cart/" className="text-body me-2">
-                                                            <i className="bi bi-pencil-square me-1" />
-                                                            Edit
-                                                        </Link>
-                                                    </div>
+                                        {
+                                            orderItems.map((orderItem) => <div key={orderItem.oid} className="row g-5 shadow p-2 mb-4 rounded-3">
+                                                <div className="col-sm-4">
+                                                    <img src={orderItem?.course?.image} className="rounded" style={{ width: "100px", height: "70px", objectFit: "cover" }} alt="" />
+                                                </div>
+                                                <div className="col-sm-8">
+                                                    <h6 className="mb-0">
+                                                        <a href="#" className='text-decoration-none text-dark'>{orderItem?.course?.title}</a>
+                                                    </h6>
+                                                    {/* <div className="d-flex justify-content-between align-items-center mt-3">
+                                                        <span className="text-success fw-bold">${orderItem?.course?.price}</span>
+                                                        <div className="text-primary-hover">
+                                                            <Link to="/cart/" className="text-body me-2">
+                                                                <i className="bi bi-pencil-square me-1" />
+                                                                Edit
+                                                            </Link>
+                                                        </div>
+                                                    </div> */}
                                                 </div>
                                             </div>
-                                        </div>
+                                            )
+                                        }
 
-
-                                        {/* Course item START */}
-                                        <div className="row g-2 shadow p-2 mb-4 rounded-3">
-                                            <div className="col-sm-4">
-                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" className="rounded" style={{ width: "100px", height: "70px", objectFit: "cover" }} alt="" />
-                                            </div>
-                                            <div className="col-sm-8">
-                                                <h6 className="mb-0">
-                                                    <a href="#" className='text-decoration-none text-dark'>Building Scalable APIs with GraphQL</a>
-                                                </h6>
-                                                <div className="d-flex justify-content-between align-items-center mt-3">
-                                                    <span className="text-success fw-bold">$150</span>
-                                                    <div className="text-primary-hover">
-                                                        <Link to="/cart/" className="text-body me-2">
-                                                            <i className="bi bi-pencil-square me-1" />
-                                                            Edit
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        {/* Course item START */}
-                                        <div className="row g-2 shadow p-2 mb-4 rounded-3">
-                                            <div className="col-sm-4">
-                                                <img src="https://eduport.webestica.com/assets/images/courses/4by3/07.jpg" className="rounded" style={{ width: "100px", height: "70px", objectFit: "cover" }} alt="" />
-                                            </div>
-                                            <div className="col-sm-8">
-                                                <h6 className="mb-0">
-                                                    <a href="#" className='text-decoration-none text-dark'>Building Scalable APIs with GraphQL</a>
-                                                </h6>
-                                                <div className="d-flex justify-content-between align-items-center mt-3">
-                                                    <span className="text-success fw-bold">$150</span>
-                                                    <div className="text-primary-hover">
-                                                        <Link to="/cart/" className="text-body me-2">
-                                                            <i className="bi bi-pencil-square me-1" />
-                                                            Edit
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div className="input-group mt-5">
                                             <input className="form-control form-control" placeholder="COUPON CODE" />
                                             <button type="button" className="btn btn-primary">Apply</button>
@@ -257,24 +212,23 @@ function Checkout() {
                                             <ul class="list-group mb-3">
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                                     Sub Total
-                                                    <span>$10.99</span>
+                                                    <span>${order?.sub_total} </span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                                     Discount
-                                                    <span>$2.99</span>
+                                                    <span>${order?.saved} </span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                                     Tax
-                                                    <span>$0.99</span>
+                                                    <span>${order?.tax_fee} </span>
                                                 </li>
                                                 <li class="list-group-item d-flex fw-bold justify-content-between align-items-center">
                                                     Total
-                                                    <span className='fw-bold'>$8.99</span>
+                                                    <span className='fw-bold'>${order?.total} </span>
                                                 </li>
                                             </ul>
                                             <div className="d-grid">
-                                                <Link to={`/success/txn_id/`} className="btn btn-lg btn-success mt-2"> Pay With PayPal</Link>
-                                                <Link to={`/success/txn_id/`} className="btn btn-lg btn-success mt-2"> Pay With Stripe</Link>
+                                                <button onClick={pay} className="btn btn-lg btn-success mt-2"> Pay With SSLCommerz</button>
                                             </div>
                                             <p className="small mb-0 mt-2 text-center">
                                                 By proceeding to payment, you agree to these{" "}<a href="#"> <strong>Terms of Service</strong></a>
