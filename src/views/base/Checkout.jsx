@@ -5,6 +5,7 @@ import BaseFooter from '../partials/BaseFooter'
 import { useEffect, useState } from 'react'
 import useAxios from '../../utils/useAxios'
 import UserData from '../plugin/UserData'
+import { OrbitProgress } from 'react-loading-indicators'
 
 
 function Checkout() {
@@ -246,7 +247,7 @@ function Checkout() {
                                             </ul>
                                             <div className="d-grid">
                                                 {
-                                                    processing ?
+                                                    !processing ?
                                                     <button onClick={pay} className="btn btn-lg btn-success mt-2" disabled={true}> Proceeding to pay...</button>
                                                     :
                                                     <button onClick={pay} className="btn btn-lg btn-success mt-2"> Pay With SSLCommerz</button>

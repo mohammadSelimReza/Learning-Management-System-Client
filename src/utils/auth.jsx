@@ -14,7 +14,10 @@ export const login = async (email, password) => {
     if (status === 200) {
       setAuthUser(data.access, data.refresh);
 
-      alert("Login Successfully!!!");
+      Toast().fire({
+        title:"Login Successfully!!!",
+        icon: "success"
+      })
     }
     return { data, error: null };
   } catch (error) {
@@ -33,7 +36,10 @@ export const registration = async (full_name, email, password, password2) => {
       password,
       password2,
     });
-    alert("Registration Successfully");
+    Toast().fire({
+      title:"Registration Successfully and check your mail",
+      icon: "success"
+    })
     return { data, error: null };
   } catch (error) {
     console.log(error.response.data.email);

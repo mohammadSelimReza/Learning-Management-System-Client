@@ -19,7 +19,7 @@ function Cart() {
     const [country, setCountry] = useState("")
     const [phone, setPhone] = useState("")
     const [cartCount, setCartCount] = useContext(CartContext)
-    cosnt [loading,setLoading] = useState(true)
+    const [loading,setLoading] = useState(true)
     const [processing,setProcessing] = useState(true)
     const navigate = useNavigate();
     const fetchCart = async () => {
@@ -249,7 +249,7 @@ function Cart() {
                                     </ul>
                                     <div className="d-grid">
                                        {
-                                        processing ?
+                                        !processing ?
                                         <button type='submit' className="btn btn-lg btn-success" disabled={true}>Processing...</button>
                                         :
                                         <button type='submit' className="btn btn-lg btn-success">Checkout</button>
