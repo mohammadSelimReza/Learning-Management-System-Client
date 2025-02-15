@@ -3,7 +3,6 @@ import { jwtDecode } from "jwt-decode";
 import apiInstance from "./axios";
 import Toast from "../views/plugin/Toast";
 
-
 export const login = async (email, password) => {
   try {
     const { data, status } = await apiInstance.post("user/token/", {
@@ -15,9 +14,9 @@ export const login = async (email, password) => {
       setAuthUser(data.access, data.refresh);
 
       Toast().fire({
-        title:"Login Successfully!!!",
-        icon: "success"
-      })
+        title: "Login Successfully!!!",
+        icon: "success",
+      });
     }
     return { data, error: null };
   } catch (error) {
@@ -37,9 +36,9 @@ export const registration = async (full_name, email, password, password2) => {
       password2,
     });
     Toast().fire({
-      title:"Registration Successfully and check your mail",
-      icon: "success"
-    })
+      title: "Registration Successfully and check your mail",
+      icon: "success",
+    });
     return { data, error: null };
   } catch (error) {
     console.log(error.response.data.email);
@@ -58,9 +57,9 @@ export const logout = () => {
   localStorage.removeItem("randomString");
   useAuthStore.getState().setUser(null);
   Toast().fire({
-    icon:"warning",
-    title:"You have successfully logged out.",
-  })
+    icon: "warning",
+    title: "You have successfully logged out.",
+  });
 };
 
 export const setUser = async () => {
@@ -88,7 +87,6 @@ export const setUser = async () => {
   }
 };
 
-
 export const setAuthUser = (access_token, refresh_token) => {
   localStorage.setItem("access_token", access_token);
   localStorage.setItem("refresh_token", refresh_token);
@@ -106,7 +104,22 @@ export const setAuthUser = (access_token, refresh_token) => {
   useAuthStore.getState().setLoading(false);
 };
 
+export const updateUserData = async () => {
+  try {
+    const refreshToken = localStorage.getItem("refresh_token");
+    if (!refreshToken) throw new Error("No refresh token found");
 
+    const response = await apiInstance.post("/user/token/refresh/", {
+      refresh: refreshToken,
+    });
+    const { access, refresh } = response.data;
+    setAuthUser(access,refresh)
+  } catch (error) {
+    console.error("Failed to refresh token", error);
+    // logout();
+    return null;
+  }
+};
 export const getRefreshToken = async () => {
   try {
     const refreshToken = localStorage.getItem("refresh_token");
@@ -119,11 +132,10 @@ export const getRefreshToken = async () => {
     return response.data;
   } catch (error) {
     console.error("Failed to refresh token", error);
-    logout();
+    // logout();
     return null;
   }
 };
-
 
 export const isAccessTokenExpired = (access_token) => {
   if (!access_token || access_token.split(".").length !== 3) {
@@ -139,4 +151,3 @@ export const isAccessTokenExpired = (access_token) => {
     return true;
   }
 };
-

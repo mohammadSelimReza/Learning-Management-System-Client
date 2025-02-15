@@ -59,20 +59,20 @@ function Index() {
   const user_id = UserData()?.user_id;
   const [testimonials, setTestimonials] = useState([]);
   const navigate = useNavigate();
-  const [loading,setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const fetchData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const res = await apiInstance.get("/course/course/");
       const blogRes = await apiInstance.get("/blog/");
-      const resReview = await apiInstance.get("/review/");
+      const resReview = await apiInstance.get("/course/review/");
       setBlogData(blogRes.data);
       setCourse(res.data.slice(0, 3));
-      setTestimonials(resReview.data?.slice(3,6));
-      setLoading(false)
+      setTestimonials(resReview.data?.slice(3, 6));
+      setLoading(false);
     } catch (error) {
       console.log(error);
-      setLoading(false)
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -105,25 +105,25 @@ function Index() {
     },
   ];
   const coureDetailView = async (slug) => {
-    setLoading(true)
+    setLoading(true);
     try {
       const res = await apiInstance.get(`/course/course/${slug}`);
       console.log(res.data);
-      setLoading(false)
+      setLoading(false);
       navigate(`/course-detail/${res.data?.slug}`);
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
     }
   };
   const handleSubscribe = (e) => {
     e.preventDefault();
     Toast().fire({
-      title:`Subscribed with: ${email}`,
-      icon:"success", 
+      title: `Subscribed with: ${email}`,
+      icon: "success",
     });
     setEmail("");
   };
-  console.log(course)
+  console.log(course);
   return (
     <>
       <BaseHeader />
@@ -158,12 +158,21 @@ function Index() {
                 >
                   Our Courses
                 </Link>
-                <Link
-                  to="/register"
-                  className="btn btn-secondary fs-4 text-inherit ms-3"
-                >
-                  Sign Up
-                </Link>
+                {user_id ? (
+                  <Link
+                    to="#"
+                    className="btn btn-secondary fs-4 text-inherit ms-3"
+                  >
+                    Contact Us
+                  </Link>
+                ) : (
+                  <Link
+                    to="/register"
+                    className="btn btn-secondary fs-4 text-inherit ms-3"
+                  >
+                    Sign Up
+                  </Link>
+                )}
               </div>
             </div>
             {/* col */}
@@ -292,70 +301,73 @@ function Index() {
           </div>
           <div className="container py-5">
             <div className="row g-4">
-              {
-                loading ?
-                (<div className="text-center">
-                <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
-                </div>)
-                :
-                (
-                  <>
+              {loading ? (
+                <div className="text-center">
+                  <OrbitProgress
+                    variant="spokes"
+                    color="#32cd32"
+                    size="medium"
+                    text=""
+                    textColor=""
+                  />
+                </div>
+              ) : (
+                <>
                   {course.map((item) => (
-                <div key={item?.course_id} className="col-md-4">
-                  <div className="card border-0 shadow-sm rounded overflow-hidden">
-                    {/* Image with Price Badge */}
-                    <div
-                      onClick={() => coureDetailView(item?.slug)}
-                      className="position-relative"
-                    >
-                      <img
-                        src={
-                          item?.image ||
-                          "https://geeksui.codescandy.com/geeks/assets/images/course/course-css.jpg"
-                        }
-                        alt="course"
-                        className="card-img-top"
-                        style={{
-                          width: "100%",
-                          height: "200px",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <span className="position-absolute bottom-0 end-0 m-2 badge bg-success fs-6 p-2">
-                        ${item?.price}
-                      </span>
-                    </div>
-
-                    {/* Card Body */}
-                    <div className="card-body bg-white">
-                      <span className="text-uppercase text-success fw-semibold fs-6">
-                        {item?.category?.title}
-                      </span>
-                      <h5 className="fw-bold text-dark mt-1">
+                    <div key={item?.course_id} className="col-md-4">
+                      <div className="card border-0 shadow-sm rounded overflow-hidden">
+                        {/* Image with Price Badge */}
                         <div
                           onClick={() => coureDetailView(item?.slug)}
-                          className="text-decoration-none text-dark"
+                          className="position-relative"
                         >
-                          <p>{item?.title}</p>
+                          <img
+                            src={
+                              item?.image ||
+                              "https://geeksui.codescandy.com/geeks/assets/images/course/course-css.jpg"
+                            }
+                            alt="course"
+                            className="card-img-top"
+                            style={{
+                              width: "100%",
+                              height: "200px",
+                              objectFit: "cover",
+                            }}
+                          />
+                          <span className="position-absolute bottom-0 end-0 m-2 badge bg-success fs-6 p-2">
+                            ${item?.price}
+                          </span>
                         </div>
-                      </h5>
-                      <div className="d-flex text-muted small">
-                        <span className="me-3">
-                          <FaUserGraduate className="me-1" />{" "}
-                          {item?.students?.length} Students
-                        </span>
-                        <span>
-                          <FaBook className="me-1" /> {item?.lectures?.length}{" "}
-                          Lessons
-                        </span>
+
+                        {/* Card Body */}
+                        <div className="card-body bg-white">
+                          <span className="text-uppercase text-success fw-semibold fs-6">
+                            {item?.category?.title}
+                          </span>
+                          <h5 className="fw-bold text-dark mt-1">
+                            <div
+                              onClick={() => coureDetailView(item?.slug)}
+                              className="text-decoration-none text-dark"
+                            >
+                              <p>{item?.title}</p>
+                            </div>
+                          </h5>
+                          <div className="d-flex text-muted small">
+                            <span className="me-3">
+                              <FaUserGraduate className="me-1" />{" "}
+                              {item?.students?.length} Students
+                            </span>
+                            <span>
+                              <FaBook className="me-1" />{" "}
+                              {item?.lectures?.length} Lessons
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-                  </>
-                )
-              }
+                  ))}
+                </>
+              )}
             </div>
             <p className="text-center py-5">
               Take the control of their life back and start doing things to make
@@ -508,46 +520,49 @@ function Index() {
           </div>
 
           <div className="row justify-content-center align-items-center">
-            {
-              loading
-              ?
-              (<div className="text-center">
-                <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
-                </div>)
-                :
-                (
-                  <>
-                  {testimonials.map((item) => (
-              <div key={item.review_id} className="col-md-4">
-                <div className="card d-flex justify-content-center align-items-center border-0 shadow-sm rounded text-center p-4">
-                  <img
-                    src={
-                      item.profile.image ||
-                      "https://res.cloudinary.com/dofqxmuya/image/upload/v1725378249/default_user_i0wpzv.png"
-                    }
-                    alt="User Avatar"
-                    className="avatar avatar-lg rounded-circle mb-3"
-                    style={{
-                      width: "80px",
-                      height: "80px",
-                      objectFit: "cover",
-                    }}
-                  />
-                  <div>
-                    <p className="mb-3">“{item.review}”</p>
-                    <div className="lh-1 mb-3">{renderStars(item.rating)}</div>
-                    <h5 className="mb-0">{item.profile.full_name}</h5>
-                    <span className="text-muted small">
-                      {item.profile.user_type}
-                    </span>
-                  </div>
-                </div>
+            {loading ? (
+              <div className="text-center">
+                <OrbitProgress
+                  variant="spokes"
+                  color="#32cd32"
+                  size="medium"
+                  text=""
+                  textColor=""
+                />
               </div>
-            ))}
-                  </>
-                )
-            }
-            
+            ) : (
+              <>
+                {testimonials.map((item) => (
+                  <div key={item.review_id} className="col-md-4">
+                    <div className="card d-flex justify-content-center align-items-center border-0 shadow-sm rounded text-center p-4">
+                      <img
+                        src={
+                          item.profile.image ||
+                          "https://res.cloudinary.com/dofqxmuya/image/upload/v1725378249/default_user_i0wpzv.png"
+                        }
+                        alt="User Avatar"
+                        className="avatar avatar-lg rounded-circle mb-3"
+                        style={{
+                          width: "80px",
+                          height: "80px",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <div>
+                        <p className="mb-3">“{item.review}”</p>
+                        <div className="lh-1 mb-3">
+                          {renderStars(item.rating)}
+                        </div>
+                        <h5 className="mb-0">{item.profile.full_name}</h5>
+                        <span className="text-muted small">
+                          {item.profile.user_type}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -559,63 +574,74 @@ function Index() {
           The ultimate planning solution for busy professionals looking to
           achieve their goals.
         </p>
-          {
-            loading ?
-            (<div className="text-center">
-              <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
-              </div>)
-              :
-              (
-                <>
-                <Swiper
-          modules={[Autoplay, Pagination, Navigation]}
-          spaceBetween={20}
-          slidesPerView={1}
-          pagination={{ clickable: true }}
-          loop={true}
-          autoplay={{
-            delay: 5000, // Reduced delay for better engagement
-            disableOnInteraction: false,
-          }}
-          breakpoints={{
-            576: { slidesPerView: 1 }, // Mobile
-            768: { slidesPerView: 2 }, // Tablets
-            1024: { slidesPerView: 3 }, // Desktop
-          }}
-        >
-          {blogData.map((blog, index) => (
-            <SwiperSlide key={index} className="p-3">
-              <div className="card border-0 shadow-sm rounded overflow-hidden">
-                {/* Image */}
-                <img
-                  src={blog?.blog_img || `https://res.cloudinary.com/dofqxmuya/image/upload/v1739316718/tablet-which-you-can-read-blog_edsmki.jpg`}
-                  className="card-img-top blog-img"
-                  alt={blog.title}
-                  style={{ width: "100%", height: "220px", objectFit: "cover" }}
-                />
+        {loading ? (
+          <div className="text-center">
+            <OrbitProgress
+              variant="spokes"
+              color="#32cd32"
+              size="medium"
+              text=""
+              textColor=""
+            />
+          </div>
+        ) : (
+          <>
+            <Swiper
+              modules={[Autoplay, Pagination, Navigation]}
+              spaceBetween={20}
+              slidesPerView={1}
+              pagination={{ clickable: true }}
+              loop={true}
+              autoplay={{
+                delay: 5000, // Reduced delay for better engagement
+                disableOnInteraction: false,
+              }}
+              breakpoints={{
+                576: { slidesPerView: 1 }, // Mobile
+                768: { slidesPerView: 2 }, // Tablets
+                1024: { slidesPerView: 3 }, // Desktop
+              }}
+            >
+              {blogData.map((blog, index) => (
+                <SwiperSlide key={index} className="p-3">
+                  <div className="card border-0 shadow-sm rounded overflow-hidden">
+                    {/* Image */}
+                    <img
+                      src={
+                        blog?.blog_img ||
+                        `https://res.cloudinary.com/dofqxmuya/image/upload/v1739316718/tablet-which-you-can-read-blog_edsmki.jpg`
+                      }
+                      className="card-img-top blog-img"
+                      alt={blog.title}
+                      style={{
+                        width: "100%",
+                        height: "220px",
+                        objectFit: "cover",
+                      }}
+                    />
 
-                {/* Card Content */}
-                <div className="card-body text-start">
-                  <h5 className="card-title fw-bold text-dark">{blog.title}</h5>
-                  <p className="card-text text-muted">
-                    {blog.blog_text.slice(0, 100)}...
-                  </p>
+                    {/* Card Content */}
+                    <div className="card-body text-start">
+                      <h5 className="card-title fw-bold text-dark">
+                        {blog.title}
+                      </h5>
+                      <p className="card-text text-muted">
+                        {blog.blog_text.slice(0, 100)}...
+                      </p>
 
-                  {/* Read More Button */}
-                  <div className="text-center mt-3">
-                    <a href="#" className="btn btn-outline-main px-4">
-                      Read More
-                    </a>
+                      {/* Read More Button */}
+                      <div className="text-center mt-3">
+                        <a href="#" className="btn btn-outline-main px-4">
+                          Read More
+                        </a>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-                </>
-              )
-          }
-        
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </>
+        )}
       </section>
 
       {/* newsletter */}

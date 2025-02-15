@@ -1,1 +1,1 @@
-export const API_BASE_URL = "https://learning-management-system-backend-9sq5loen6.vercel.app/api/v1";
+export const API_BASE_URL = "http://127.0.0.1:8000/api/v1";

@@ -70,7 +70,7 @@ function BaseHeader() {
                 </Link>
               </li>
               <li>
-                <Link className="dropdown-item" to={`/student/courses/`}>
+                <Link className="dropdown-item" to={`/student/course/detail`}>
                   {" "}
                   <i className="fas fa-shopping-cart"></i>My Courses
                 </Link>
@@ -86,43 +86,6 @@ function BaseHeader() {
           </li>
         </>
       ) : null}
-      {isLoggedIn && teacher ? (
-        <>
-          <li className="nav-item dropdown">
-            <a
-              className="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <i className="fas fa-graduation-cap"></i> Instructor
-            </a>
-            <ul className="dropdown-menu">
-              <li>
-                <Link className="dropdown-item" to={`/student/checkout/`}>
-                  {" "}
-                  <i className="bi bi-grid-fill"></i> My Checkout
-                </Link>
-              </li>
-              <li>
-                <Link className="dropdown-item" to={`/student/courses/`}>
-                  {" "}
-                  <i className="fas fa-shopping-cart"></i>My Courses
-                </Link>
-              </li>
-
-              <li>
-                <Link className="dropdown-item" to={`/student/profile/`}>
-                  {" "}
-                  <i className="fas fa-gear"></i> Profile & Settings
-                </Link>
-              </li>
-            </ul>
-          </li>
-        </>
-      ) : null}
-      
     </>
   );
   return (

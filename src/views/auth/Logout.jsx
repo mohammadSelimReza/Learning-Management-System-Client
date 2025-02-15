@@ -30,10 +30,10 @@ function Logout() {
                 </div>
                 <form className="needs-validation mt-5" noValidate="">
                   <div className="d-grid d-flex">
-                    <Link to="/login" className="btn btn-primary me-2 w-100">
+                    <Link to="/login" className="btn btn-main me-2 w-100">
                       Login <i className="fas fa-sign-in-alt"></i>
                     </Link>
-                    <Link to="/register" className="btn btn-primary w-100">
+                    <Link to="/register" className="btn btn-main w-100">
                       Register <i className="fas fa-user-plus"></i>
                     </Link>
                   </div>
