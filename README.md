@@ -1,3 +1,9 @@
+![image](https://github.com/user-attachments/assets/4d8ba02e-9462-4996-832f-804c306a707a)
+![image](https://github.com/user-attachments/assets/a9c6f157-8ed7-44f8-85c3-6fe83c10d0e5)
+![image](https://github.com/user-attachments/assets/d2a11f0f-801b-4164-a920-32eb74eb407c)
+![image](https://github.com/user-attachments/assets/9db63b11-e056-4e52-b91b-571f5587bb4e)
+![image](https://github.com/user-attachments/assets/650c75f1-848c-4e0f-ad28-fd41ba80ca6e)
+
 # E-Learning Platform
 
 This is a full-featured e-learning platform that allows users to browse courses, enroll, and manage their learning journey. The project uses Django and Django REST Framework for the backend and React for the frontend. It includes features such as authentication, course management, cart and checkout functionalities, and integration with SSLCommerz for payments.
