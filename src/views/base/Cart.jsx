@@ -12,6 +12,8 @@ import { OrbitProgress } from 'react-loading-indicators'
 
 function Cart() {
     const user_id = UserData()?.user_id;
+    const user_name = UserData()?.full_name;
+    const user_email = UserData()?.email;
     const [cart, setCart] = useState([])
     const [cartItem, setCartItem] = useState([])
     const [name, setName] = useState("")
@@ -50,7 +52,8 @@ function Cart() {
     }
     useEffect(() => {
         fetchCart()
-
+        setName(user_name);
+        setEmail(user_email);
     }, [])
     const createOrder = async (e) => {
         setProcessing(true)
@@ -181,7 +184,7 @@ function Cart() {
                                                 type="text"
                                                 className="form-control"
                                                 id="yourName"
-                                                placeholder="Name"
+                                                value={name}
                                             />
                                         </div>
                                         {/* Email */}
@@ -194,7 +197,7 @@ function Cart() {
                                                 type="email"
                                                 className="form-control"
                                                 id="emailInput"
-                                                placeholder="Email"
+                                                value={user_email}
                                             />
                                         </div>
                                         {/* phone */}

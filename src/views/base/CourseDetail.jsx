@@ -45,7 +45,7 @@ function CourseDetail() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await useAxios().get(`/course/course/${param?.slug}`);
+      const res = await apiInstance.get(`/course/course/${param?.slug}`);
       setCourse(res.data);
       setLoading(false);
     } catch (error) {
@@ -363,7 +363,7 @@ function CourseDetail() {
                                         <li className="list-inline-item me-3">
                                           <a
                                             href="#"
-                                            className="fs-5 text-twitter"
+                                            className="fs-5 text-twitter primary-text"
                                           >
                                             <i className="fab fa-twitter-square" />
                                           </a>
@@ -371,7 +371,7 @@ function CourseDetail() {
                                         <li className="list-inline-item me-3">
                                           <a
                                             href="#"
-                                            className="fs-5 text-facebook"
+                                            className="fs-5 text-facebook primary-text"
                                           >
                                             <i className="fab fa-facebook-square" />
                                           </a>
@@ -379,7 +379,7 @@ function CourseDetail() {
                                         <li className="list-inline-item me-3">
                                           <a
                                             href="#"
-                                            className="fs-5 text-linkedin"
+                                            className="fs-5 text-linkedin primary-text"
                                           >
                                             <i className="fab fa-linkedin" />
                                           </a>

@@ -12,12 +12,46 @@ import { updateUserData } from "../../utils/auth";
 import { useNavigate } from "react-router";
 
 function Profile() {
+  const user = UserData();
   const [name, setName] = useState("");
   const [about, setAbout] = useState("");
   const [country, setCountry] = useState("");
   const [profile, setProfile] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [thumbNail, setThumbNail] = useState(
+    user?.image ||
+      "https://www.eclosio.ong/wp-content/uploads/2018/08/default.png"
+  );
+  const handleImage = (event) => {
+    uploadPhoto(event.target.files[0]);
+  };
+  const uploadPhoto = async (file) => {
+    setUploadingPhoto(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "vaccinereactup");
+    formData.append("cloud_name", "dofqxmuya");
 
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dofqxmuya/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+      setThumbNail(data.secure_url);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to upload photo. Please try again.");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
   const fetchProfile = () => {
     setLoading(true);
     useAxios()
@@ -45,6 +79,7 @@ function Profile() {
     try {
       const formData = {
         user: user_id,
+        image:thumbNail,
         full_name: name,
         about: about,
         country: country,
@@ -54,9 +89,8 @@ function Profile() {
         title: "Profile Detail Successfully Updated.Login Again",
         icon: "success",
       });
-      navigate("/logout")
+      navigate("/logout");
       setLoading(false);
-      
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -101,7 +135,7 @@ function Profile() {
                     <div className="d-lg-flex align-items-center justify-content-between">
                       <div className="d-flex align-items-center mb-4 mb-lg-0">
                         <img
-                          src="https://eduport.webestica.com/assets/images/avatar/09.jpg"
+                          src={`${thumbNail}`}
                           id="img-uploaded"
                           className="avatar-xl rounded-circle"
                           alt="avatar"
@@ -118,11 +152,12 @@ function Profile() {
                             PNG or JPG no bigger than 800px wide and tall.
                           </p>
                           <input
-                            type="file"
-                            className="form-control mt-3"
-                            name=""
-                            id=""
-                          />
+                          id="courseTHumbnail"
+                          className="form-control"
+                          type="file"
+                          name="thumbnail_photo"
+                          onChange={handleImage}
+                        />
                         </div>
                       </div>
                     </div>

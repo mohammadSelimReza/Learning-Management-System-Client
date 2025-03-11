@@ -46,6 +46,11 @@
     color:white;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
+  .btn-one{
+    background-color: var(--primay-color);
+    color:white;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
   .btn-main:hover{
     background-color: var(--secondar-color);
     color: white;

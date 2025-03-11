@@ -221,7 +221,7 @@ function Checkout() {
 
                                         <div className="input-group mt-5">
                                             <input className="form-control form-control" placeholder="COUPON CODE" />
-                                            <button type="button" className="btn btn-primary">Apply</button>
+                                            <button type="button" className="btn btn-one">Apply</button>
                                         </div>
 
 

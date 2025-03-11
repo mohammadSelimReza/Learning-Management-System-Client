@@ -63,11 +63,11 @@ function Index() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await apiInstance.get("/course/course/");
+      const res = await apiInstance.get("/course/list/");
       const blogRes = await apiInstance.get("/blog/");
       const resReview = await apiInstance.get("/course/review/");
       setBlogData(blogRes.data);
-      setCourse(res.data.slice(0, 3));
+      setCourse(res.data.results.slice(0, 4));
       setTestimonials(resReview.data?.slice(3, 6));
       setLoading(false);
     } catch (error) {
@@ -314,7 +314,7 @@ function Index() {
               ) : (
                 <>
                   {course.map((item) => (
-                    <div key={item?.course_id} className="col-md-4">
+                    <div key={item?.course_id} className="col-md-3">
                       <div className="card border-0 shadow-sm rounded overflow-hidden">
                         {/* Image with Price Badge */}
                         <div
@@ -341,25 +341,27 @@ function Index() {
 
                         {/* Card Body */}
                         <div className="card-body bg-white">
-                          <span className="text-uppercase text-success fw-semibold fs-6">
-                            {item?.category?.title}
+                          <span className="text-uppercase text-success fw-semibold" style={{'fontSize':'14px' }}>
+                            {item?.category}
                           </span>
+                          <div style={{'height':'60px'}}>
                           <h5 className="fw-bold text-dark mt-1">
                             <div
                               onClick={() => coureDetailView(item?.slug)}
                               className="text-decoration-none text-dark"
                             >
-                              <p>{item?.title}</p>
+                              <p  >{item?.title}</p>
                             </div>
                           </h5>
+                          </div>
                           <div className="d-flex text-muted small">
                             <span className="me-3">
                               <FaUserGraduate className="me-1" />{" "}
-                              {item?.students?.length} Students
+                              {item?.total_students} Students
                             </span>
                             <span>
                               <FaBook className="me-1" />{" "}
-                              {item?.lectures?.length} Lessons
+                              {item?.total_lessons} Lessons
                             </span>
                           </div>
                         </div>
@@ -397,7 +399,7 @@ function Index() {
           {/* Stats Row */}
           <div className="row text-center">
             {/* Instructors */}
-            <div className="col-md-6 col-lg-3 border-top-md border-top pb-4 border-end-md">
+            <div className="co6 style={{'fontSize':'14px' }} col-lg-3 border-top-md border-top pb-4 border-end-md">
               <h2 className="text-success fw-bold">
                 {inView && <CountUp start={1} end={90} duration={2} />}
               </h2>
@@ -405,7 +407,7 @@ function Index() {
               <p className="text-muted small">
                 Tempus imperdiet nulla malpellen tesque Malesuada libero
               </p>
-            </div>
+              </div>
 
             {/* Total Courses */}
             <div className="col-md-6 col-lg-3 border-top-md border-top border-end-lg">
@@ -549,7 +551,7 @@ function Index() {
                         }}
                       />
                       <div>
-                        <p className="mb-3">“{item.review}”</p>
+                        <p className="mb-3" style={{'height':'110px'}}>“{item.review}”</p>
                         <div className="lh-1 mb-3">
                           {renderStars(item.rating)}
                         </div>
@@ -590,10 +592,9 @@ function Index() {
               modules={[Autoplay, Pagination, Navigation]}
               spaceBetween={20}
               slidesPerView={1}
-              pagination={{ clickable: true }}
               loop={true}
               autoplay={{
-                delay: 5000, // Reduced delay for better engagement
+                delay: 2000, // Reduced delay for better engagement
                 disableOnInteraction: false,
               }}
               breakpoints={{
@@ -622,7 +623,7 @@ function Index() {
 
                     {/* Card Content */}
                     <div className="card-body text-start">
-                      <h5 className="card-title fw-bold text-dark">
+                      <h5 className="card-title fw-bold text-dark" style={{'height':'40px'}}>
                         {blog.title}
                       </h5>
                       <p className="card-text text-muted">

@@ -6,9 +6,11 @@ import Sidebar from "./Partials/Sidebar";
 import Header from "./Partials/Header";
 import UserData from "../plugin/UserData";
 import useAxios from "../../utils/useAxios";
+import { OrbitProgress } from "react-loading-indicators";
 
 function CartCheckout() {
   const [checkout, setCheckOut] = useState([]);
+  const [loading,setLoading] = useState(true);
   const user_id = UserData()?.user_id;
   const navigate = useNavigate();
   useEffect(() => {
@@ -18,12 +20,15 @@ function CartCheckout() {
   }, [user_id]);
 
   const fetchOrders = async () => {
+    setLoading(true)
     try {
       const res = await useAxios().get(`/order/check-order/${user_id}`);
       setCheckOut(res.data);
-      console.log(res.data)
+      console.log(res.data);
+      setLoading(false)
     } catch (error) {
       console.error("Error fetching orders:", error);
+      setLoading(false)
     }
   };
   const payNow = (orderID) => {
@@ -50,61 +55,80 @@ function CartCheckout() {
                         <th>Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {checkout?.map((order) => (
-                        <tr key={order.oid}>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <img
-                                src="https://geeksui.codescandy.com/geeks/assets/images/course/course-wordpress.jpg"
-                                alt="course"
-                                className="rounded img-4by3-lg"
-                                style={{
-                                  width: "100px",
-                                  height: "70px",
-                                  borderRadius: "50%",
-                                  objectFit: "cover",
-                                }}
+                    {loading ? (
+                      <>
+                        <tbody>
+                          <tr>
+                            <td colSpan="100%" className="text-center">
+                              <OrbitProgress
+                                variant="spokes"
+                                color="#32cd32"
+                                size="medium"
                               />
-                              <div className="ms-3">
-                                <h5 className="mb-1">
-                                  <Link
-                                    to="#"
-                                    className="text-inherit text-decoration-none text-dark"
-                                  >
-                                    Order No: {order?.oid}
-                                  </Link>
-                                </h5>
-                                
+                            </td>
+                          </tr>
+                        </tbody>
+                      </>
+                    ) : (
+                      <tbody>
+                        {checkout?.map((order) => (
+                          <tr key={order.oid}>
+                            <td>
+                              <div className="d-flex align-items-center">
+                                <img
+                                  src="https://geeksui.codescandy.com/geeks/assets/images/course/course-wordpress.jpg"
+                                  alt="course"
+                                  className="rounded img-4by3-lg"
+                                  style={{
+                                    width: "100px",
+                                    height: "70px",
+                                    borderRadius: "50%",
+                                    objectFit: "cover",
+                                  }}
+                                />
+                                <div className="ms-3">
+                                  <h5 className="mb-1">
+                                    <Link
+                                      to="#"
+                                      className="text-inherit text-decoration-none text-dark"
+                                    >
+                                      Order No: {order?.oid}
+                                    </Link>
+                                  </h5>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p className="mt-3">
-                              {new Date(order.date).toLocaleDateString()}
-                            </p>
-                          </td>
-                          <td>
-                            <p className="mt-3">${order.initial_total}</p>
-                          </td>
-                          <td>
-                            <p className="mt-3">${order.sub_total}</p>
-                          </td>
-                          <td>
-                            <button onClick={()=>payNow(order?.oid)} className="btn btn-primary btn-sm mt-3">
-                              Continue To Pay   <i className="fas fa-arrow-right"></i>
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                      {checkout.length === 0 && (
-                        <tr>
-                          <td colSpan="5" className="text-center">
-                            No pending orders found.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
+                            </td>
+                            <td>
+                              <p className="mt-3">
+                                {new Date(order.date).toLocaleDateString()}
+                              </p>
+                            </td>
+                            <td>
+                              <p className="mt-3">${order.initial_total}</p>
+                            </td>
+                            <td>
+                              <p className="mt-3">${order.sub_total}</p>
+                            </td>
+                            <td>
+                              <button
+                                onClick={() => payNow(order?.oid)}
+                                className="btn btn-primary btn-sm mt-3"
+                              >
+                                Continue To Pay{" "}
+                                <i className="fas fa-arrow-right"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {checkout.length === 0 && (
+                          <tr>
+                            <td colSpan="5" className="text-center">
+                              No pending orders found.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    )}
                   </table>
                 </div>
               </div>

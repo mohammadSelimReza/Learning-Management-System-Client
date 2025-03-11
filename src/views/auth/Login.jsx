@@ -28,6 +28,46 @@ function Login() {
       setLoading(false);
     }
   };
+  const autoLogin = async (e) => {
+    e.preventDefault();
+    setEmailErr("");
+    setPassErr("");
+    setLoading(true);
+    const { error } = await login(
+      "selim.reza.uits@gmail.com",
+      "Django_project_2025"
+    );
+
+    console.log(error?.detail);
+    if (error) {
+      if (error.detail) setEmailErr(error.detail);
+      if (error.password) setPassErr(error.password);
+      setLoading(false);
+    } else {
+      navigate("/");
+      setLoading(false);
+    }
+  };
+  const autoLogin2 = async (e) => {
+    e.preventDefault();
+    setEmailErr("");
+    setPassErr("");
+    setLoading(true);
+    const { error } = await login(
+      "srreza1999@gmail.com",
+      "Django_project_2025"
+    );
+
+    console.log(error?.detail);
+    if (error) {
+      if (error.detail) setEmailErr(error.detail);
+      if (error.password) setPassErr(error.password);
+      setLoading(false);
+    } else {
+      navigate("/");
+      setLoading(false);
+    }
+  };
   return (
     <>
       <BaseHeader />
@@ -104,7 +144,9 @@ function Login() {
                       </div>
                     </div>
                     <div>
-                      <Link to="/forget-password/" className="primary-text">Forgot your password?</Link>
+                      <Link to="/forget-password/" className="primary-text">
+                        Forgot your password?
+                      </Link>
                     </div>
                   </div>
                   <div>
@@ -116,7 +158,8 @@ function Login() {
                       >
                         {loading ? (
                           <p>
-                            logging...<i className="fas fa-spinner fa-spin"></i>{" "}
+                            logging...
+                            <i className="fas fa-spinner fa-spin"></i>{" "}
                           </p>
                         ) : (
                           <p>
@@ -130,6 +173,40 @@ function Login() {
               </div>
             </div>
           </div>
+        </div>
+        <div className="d-flex flex-column gap-3 justify-content-center align-items-center my-5">
+          <button
+            onClick={autoLogin}
+            type="submit"
+            className="btn btn-main py-2"
+            disabled={loading}
+          >
+            {loading ? (
+              <p>
+                logging...<i className="fas fa-spinner fa-spin"></i>{" "}
+              </p>
+            ) : (
+              <p>
+                Test Login USER<i className="fas fa-sign-in-alt"></i>
+              </p>
+            )}
+          </button>
+          <button
+            onClick={autoLogin2}
+            type="submit"
+            className="btn btn-main py-2"
+            disabled={loading}
+          >
+            {loading ? (
+              <p>
+                logging...<i className="fas fa-spinner fa-spin"></i>{" "}
+              </p>
+            ) : (
+              <p>
+                Test Login Teacher<i className="fas fa-sign-in-alt"></i>
+              </p>
+            )}
+          </button>
         </div>
       </section>
 

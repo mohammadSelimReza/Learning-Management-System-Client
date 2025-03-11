@@ -28,7 +28,7 @@ function Sidebar() {
                             <li className="nav-item">
                                 <Link className="nav-link" to={`/student/checkout/`}>
                                     {" "}
-                                    <i className="bi bi-grid-fill"></i>Checkout
+                                    <i className="bi bi-grid-fill"></i> Checkout
                                 </Link>
                             </li>
                             <li className="nav-item">

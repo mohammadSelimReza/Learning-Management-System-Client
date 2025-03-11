@@ -79,11 +79,27 @@ function StudentCourseDetail() {
                           }
                           className="card-body d-flex justify-content-between"
                         >
-                          <div>
-                            <h5 className="card-title">
-                              {courseItem?.course?.title}
-                            </h5>
-                            <small>Enroll ID: {courseItem?.enrolled_id} </small>
+                          <div className="d-flex">
+                            <div className="w-100px w-md-80px mb-2 mb-md-0">
+                              <img
+                                src={courseItem?.course?.image}
+                                style={{
+                                  width: "100px",
+                                  height: "70px",
+                                  objectFit: "cover",
+                                }}
+                                className="rounded"
+                                alt=""
+                              />
+                            </div>
+                            <div>
+                              <h5 className="card-title">
+                                {courseItem?.course?.title}
+                              </h5>
+                              <small>
+                                Enroll ID: {courseItem?.enrolled_id}{" "}
+                              </small>
+                            </div>
                           </div>
                           <div>
                             <p>
@@ -92,6 +108,7 @@ function StudentCourseDetail() {
                                 "DD MMM,YYYY"
                               )}{" "}
                             </p>
+                            <button type="button" className="btn btn-success">View Detail</button>
                           </div>
                         </div>
                       </div>
